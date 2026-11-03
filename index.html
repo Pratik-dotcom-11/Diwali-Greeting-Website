@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#39091d">
+<meta name="description" content="Light a diya, create a rangoli and send a personalised Diwali greeting with Diwali Digital Diya.">
+<title>Diwali Digital Diya — A Festival of Light</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<script>(function(){try{var n=navigator,c=n.connection||{},q=location.search,l=false;try{l=localStorage.getItem("dd-lite")==="1"}catch(e){}if(q.indexOf("fx=full")>-1){l=false}else if(q.indexOf("fx=lite")>-1||l||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)||(n.deviceMemory&&n.deviceMemory<=4)||c.saveData||matchMedia("(prefers-reduced-data: reduce)").matches){l=true}if(l){window.__lite=true;document.documentElement.classList.add("lite")}}catch(e){}})();</script>
+<canvas id="fxCanvas" aria-hidden="true"></canvas><div class="intro-veil" aria-hidden="true"></div><div class="intro-greet" id="introGreet" aria-hidden="true"><div class="lamp">🪔</div><h2>Shubh Deepavali</h2><p>Happy Diwali</p><p class="by">✦ A Nexora creation ✦</p></div>
+<div class="ambient"></div><div class="orb one"></div><div class="orb two"></div>
+<nav>
+  <div class="brand"><div class="brand-mark">🪔</div><div>Digital Diya<small>Festival of Lights</small></div></div>
+  <div class="navlinks"><a href="#experience">Experience</a><a href="#greeting">Create greeting</a><a href="#photo-card">Photo card</a><a href="#rangoli">Rangoli</a><a href="#team">Team</a></div>
+  <button class="nav-cta" onclick="document.querySelector('#greeting').scrollIntoView({behavior:'smooth'})">Create a wish ↗</button>
+</nav>
+<button class="music-toggle" id="musicBtn" onclick="toggleMusic()">♫ Music: Off</button>
+<header class="hero" id="top">
+ <div>
+  <div class="eyebrow"><span class="pulse"></span> A little light goes a long way</div>
+  <h1>Let your<br><span class="goldtext">light shine.</span></h1>
+  <p>Celebrate the festival of lights with a joyful digital experience. Light a diya, design a rangoli, create a personal greeting and send a little happiness to someone special.</p>
+  <div class="hero-actions"><button class="btn" onclick="document.querySelector('#experience').scrollIntoView({behavior:'smooth'})">Explore the magic ✨</button><button class="btn secondary" onclick="document.querySelector('#greeting').scrollIntoView({behavior:'smooth'})">Create your greeting</button></div>
+  <p class="hero-note">Made to share warmth, happiness and festive moments.</p>
+ </div>
+ <div class="hero-art" aria-label="An animated glowing diya">
+  <div class="halo"></div><div class="ring"><span>✦</span><span>✧</span><span>✦</span><span>✧</span></div>
+  <span class="spark s1">✧</span><span class="spark s2">✦</span><span class="spark s3">✧</span>
+  <div class="main-diya"><div class="flame"></div><div class="wick"></div><div class="bowl"></div></div>
+ </div>
+</header>
+<div class="marquee" aria-label="Nexora — Pratik Ghosh and Samragyni Bhowmick"><div class="mq-row" aria-hidden="true"><div class="mq-track"><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i><span class="mq-brand">NEXORA</span><i class="mq-sep">🪔</i><span class="mq-name">Pratik Ghosh</span><i class="mq-sep">✦</i><span class="mq-name">Samragyni Bhowmick</span><i class="mq-sep">✦</i><span class="mq-name">Shubh Deepavali</span><i class="mq-sep">🎆</i></div></div><div class="mq-row rev" aria-hidden="true"><div class="mq-track"><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i><span class="mq-small">Nexora</span><i class="mq-sep">✧</i><span class="mq-small">Happy Diwali</span><i class="mq-sep">✧</i><span class="mq-small">Pratik Ghosh</span><i class="mq-sep">✧</i><span class="mq-small">Samragyni Bhowmick</span><i class="mq-sep">✧</i><span class="mq-small">Festival of Lights</span><i class="mq-sep">✧</i></div></div></div>
+<section class="content" id="experience">
+ <div class="section-head"><div class="kicker">The festive experience</div><h2>More than a greeting.</h2><p>A playful celebration with little moments you can interact with, personalise and share.</p></div>
+ <div class="feature-grid">
+  <article class="feature"><div class="icon">🪔</div><h3>Light a diya</h3><p>Tap the lamps and watch their warm flames glow. Each light adds to the celebration.</p></article>
+  <article class="feature"><div class="icon">💌</div><h3>Personal greetings</h3><p>Write a wish for someone special and create a greeting card with their name.</p></article>
+  <article class="feature"><div class="icon">🌸</div><h3>Digital rangoli</h3><p>Choose colours and draw your own festive pattern on an interactive canvas.</p></article>
+  <article class="feature"><div class="icon">🎆</div><h3>Fireworks</h3><p>Launch a burst of colourful celebration with a click of the button.</p></article>
+  <article class="feature"><div class="icon">🎵</div><h3>Festive sounds</h3><p>Turn on a gentle generated melody while you explore the celebration.</p></article>
+  <article class="feature"><div class="icon">📲</div><h3>Share the joy</h3><p>Copy your greeting or share it through WhatsApp with friends and family.</p></article>
+ </div>
+</section>
+<div class="ribbons" aria-label="Happy Diwali in many languages"><div class="rb rb-a" aria-hidden="true"><div class="rb-track" data-dir="-1" data-speed="1.1"><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic">🪔</i><span class="rb-big">Happy <em>Diwali</em></span><i class="rb-ic sp">✦</i><span class="rb-big">Shubh <em>Deepavali</em></span><i class="rb-ic">🎆</i></div></div><div class="rb rb-b" aria-hidden="true"><div class="rb-track" data-dir="1" data-speed="0.8"><span class="rb-lang">शुभ दीपावली</span><i class="rb-dot">✧</i><span class="rb-lang">শুভ দীপাবলি</span><i class="rb-dot">✧</i><span class="rb-lang f">Happy Diwali</span><i class="rb-dot">✧</i><span class="rb-lang">தீபாவளி நல்வாழ்த்துக்கள்</span><i class="rb-dot">✧</i><span class="rb-lang">દિવાળીની શુભકામનાઓ</span><i class="rb-dot">✧</i><span class="rb-lang f">దీపావళి శుభాకాంక్షలు</span><i class="rb-dot">✧</i><span class="rb-lang">ਦੀਵਾਲੀ ਦੀਆਂ ਵਧਾਈਆਂ</span><i class="rb-dot">✧</i><span class="rb-lang">ദീപാവലി ആശംസകൾ</span><i class="rb-dot">✧</i><span class="rb-lang f">ದೀಪಾವಳಿ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು</span><i class="rb-dot">✧</i><span class="rb-lang">शुभ दीपावली</span><i class="rb-dot">✧</i><span class="rb-lang">শুভ দীপাবলি</span><i class="rb-dot">✧</i><span class="rb-lang f">Happy Diwali</span><i class="rb-dot">✧</i><span class="rb-lang">தீபாவளி நல்வாழ்த்துக்கள்</span><i class="rb-dot">✧</i><span class="rb-lang">દિવાળીની શુભકામનાઓ</span><i class="rb-dot">✧</i><span class="rb-lang f">దీపావళి శుభాకాంక్షలు</span><i class="rb-dot">✧</i><span class="rb-lang">ਦੀਵਾਲੀ ਦੀਆਂ ਵਧਾਈਆਂ</span><i class="rb-dot">✧</i><span class="rb-lang">ദീപാവലി ആശംസകൾ</span><i class="rb-dot">✧</i><span class="rb-lang f">ದೀಪಾವಳಿ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು</span><i class="rb-dot">✧</i><span class="rb-lang">शुभ दीपावली</span><i class="rb-dot">✧</i><span class="rb-lang">শুভ দীপাবলি</span><i class="rb-dot">✧</i><span class="rb-lang f">Happy Diwali</span><i class="rb-dot">✧</i><span class="rb-lang">தீபாவளி நல்வாழ்த்துக்கள்</span><i class="rb-dot">✧</i><span class="rb-lang">દિવાળીની શુભકામનાઓ</span><i class="rb-dot">✧</i><span class="rb-lang f">దీపావళి శుభాకాంక్షలు</span><i class="rb-dot">✧</i><span class="rb-lang">ਦੀਵਾਲੀ ਦੀਆਂ ਵਧਾਈਆਂ</span><i class="rb-dot">✧</i><span class="rb-lang">ദീപാവലി ആശംസകൾ</span><i class="rb-dot">✧</i><span class="rb-lang f">ದೀಪಾವಳಿ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು</span><i class="rb-dot">✧</i></div></div></div>
+<section class="content" id="greeting">
+ <div class="section-head"><div class="kicker">Made with love</div><h2>Create a personal Diwali wish</h2><p>A name, a thoughtful message and a little golden glow. Make a greeting that feels like yours.</p></div>
+ <div class="two-col">
+  <div class="panel">
+   <label class="field" for="sender">Your name</label><input class="input" id="sender" placeholder="e.g. Sam" maxlength="35">
+   <label class="field" for="receiver">Send this wish to</label><input class="input" id="receiver" placeholder="e.g. My best friend" maxlength="45">
+   <label class="field" for="message">Your message</label><textarea id="message" placeholder="May your home be filled with light, laughter and love..." maxlength="240"></textarea>
+   <div class="actions"><button class="btn" onclick="generateGreeting()">Update greeting ✨</button><button class="small-btn" onclick="resetGreeting()">Reset</button></div>
+   <div class="actions"><button class="small-btn" onclick="shareGreeting()">Share on WhatsApp ↗</button><button class="small-btn" onclick="copyGreeting()">Copy greeting</button></div>
+  </div>
+  <div class="panel preview" id="greetingCard">
+   <div class="mini">🪔 ✨ 🪔</div><div class="kicker">A wish for you</div><h3>Happy Diwali!</h3>
+   <p id="previewTo">May your life shine brighter with every diya.</p><p class="from" id="previewFrom">With warm wishes</p>
+  </div>
+ </div>
+</section>
+
+<section class="content" id="photo-card">
+ <div class="section-head"><div class="kicker">A memory wrapped in light</div><h2>Make a Diwali photo card</h2><p>Add your favourite picture, write a warm wish and create a festive card to download or share.</p></div>
+ <div class="photo-upload">
+  <div class="panel">
+   <label class="field" for="photoInput">Choose a picture</label>
+   <div class="photo-drop"><div style="font-size:34px">🖼️</div><p style="font-weight:700;margin:8px 0;color:#ffe7a6">Upload your favourite photo</p><input id="photoInput" type="file" accept="image/*"><p class="photo-hint">Choose a photo from your phone or computer. JPG, PNG and other common image formats are supported.</p></div>
+   <label class="field" for="photoTo">To</label><input class="input" id="photoTo" placeholder="Someone special" maxlength="45">
+   <label class="field" for="photoMessage">Your Diwali wish</label><textarea id="photoMessage" maxlength="220" placeholder="Wishing you a Diwali filled with happiness, light and love!"></textarea>
+   <label class="field" for="photoFrom">From</label><input class="input" id="photoFrom" placeholder="Your name" maxlength="40">
+   <div class="photo-actions"><button class="btn" onclick="updatePhotoCard()">Update photo card ✨</button><button class="small-btn" onclick="downloadPhotoCard()">Download card ↓</button></div>
+   <div class="photo-actions"><button class="small-btn" onclick="sharePhotoCard()">Share card ↗</button></div>
+   <p class="photo-hint">Your photo is processed in your browser. Download the finished card, or use Share on a supported device.</p>
+  </div>
+  <div class="photo-preview" id="photoCardPreview">
+   <div class="photo-placeholder" id="photoPlaceholder">🪔 ✨ 🪔</div><img id="photoPreviewImage" alt="Your uploaded Diwali photo">
+   <div class="photo-card-copy"><div class="photo-spark">✦ ✧ ✦</div><h3>Happy Diwali!</h3><p id="photoPreviewTo">To someone special</p><p id="photoPreviewMessage">Wishing you a Diwali filled with happiness, light and love!</p><small id="photoPreviewFrom">With warm wishes</small><div class="photo-spark" style="margin-top:14px">🪔 ✨ 🪔</div></div>
+  </div>
+ </div>
+</section>
+
+<section class="content" id="diya">
+ <div class="section-head"><div class="kicker">A thousand little lights</div><h2>Light up the diyas</h2><p>Tap each diya to light it. Make the whole screen glow with festive warmth.</p></div>
+ <div class="panel"><div class="diya-grid" id="diyaGrid"></div><div class="counter" id="diyaCount">0 of 10 diyas glowing</div><div style="text-align:center;margin-top:15px"><button class="small-btn" onclick="lightAll()">Light all diyas ✨</button> <button class="small-btn" onclick="resetDiyas()">Start again</button></div></div>
+</section>
+<section class="content" id="rangoli">
+ <div class="section-head"><div class="kicker">Your digital art corner</div><h2>Create a little rangoli</h2><p>Pick a colour, then tap or drag on the canvas to make your own festive design.</p></div>
+ <div class="panel rangoli-layout">
+  <div class="rangoli-wrap"><canvas id="rangoliCanvas" width="500" height="500" aria-label="Interactive rangoli drawing canvas"></canvas></div>
+  <div><div class="field">Choose a colour</div><div class="palette" id="palette"></div><label class="field" for="brush">Brush size</label><input id="brush" type="range" min="3" max="28" value="10" style="width:100%;accent-color:#ffd66b"><button class="tool-btn primary" onclick="saveRangoli()">Download my rangoli ↓</button><button class="tool-btn" onclick="clearRangoli()">Clear canvas</button><p style="font-size:11px;color:#e7c6d1;line-height:1.6">Tip: draw dots, petals and circles to create a festive pattern. On mobile, use your finger.</p></div>
+ </div>
+</section>
+<section class="content">
+ <div class="panel celebrate">
+  <div class="kicker">Ready for a little magic?</div><h2>Let the sky sparkle!</h2><p>Press the button and send a burst of Diwali joy across the screen.</p>
+  <div class="firework-area" id="fireworkArea"></div>
+  <button class="btn" onclick="launchFireworks()">Celebrate with fireworks 🎆</button>
+ </div>
+</section>
+
+<section class="content team" id="team">
+ <div class="section-head"><div class="kicker">Crafted with light by</div></div>
+ <div class="nexora" aria-label="Nexora"><span style="--i:0">N</span><span style="--i:1">E</span><span style="--i:2">X</span><span style="--i:3">O</span><span style="--i:4">R</span><span style="--i:5">A</span></div>
+ <p class="tagline">A duo team · Two minds, one light</p>
+ <div class="team-grid">
+  <div class="team-card"><div class="avatar">PG</div><h3>Pratik Ghosh</h3><p>Co-creator</p></div>
+  <div class="team-card"><div class="avatar">SB</div><h3>Samragyni Bhowmick</h3><p>Co-creator</p></div>
+ </div>
+</section>
+
+<footer><strong>🪔 Diwali Digital Diya</strong><br>May your days be bright and your celebrations be beautiful.<br><span class="credit">Crafted by Nexora · Pratik Ghosh &amp; Samragyni Bhowmick</span><br><span style="opacity:.7">A festive website concept · Built with HTML, CSS & JavaScript</span></footer>
+<button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+<div class="toast" id="toast">Copied!</div>
+<script src="js/script.js"></script>
+</body>
+</html>
