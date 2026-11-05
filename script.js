@@ -10,18 +10,26 @@ const grid=$('diyaGrid');for(let i=1;i<=10;i++){const d=document.createElement('
 function updateCount(){const n=document.querySelectorAll('.diya-card.lit').length;$('diyaCount').textContent=`${n} of 10 diyas glowing`;if(n===10){toast('A beautiful circle of light!');window.fxShow&&fxShow(5)}}
 function lightAll(){document.querySelectorAll('.diya-card').forEach((d,i)=>setTimeout(()=>{if(!d.classList.contains('lit')){d.classList.add('lit');diyaFx(d)}updateCount()},i*140))}
 function resetDiyas(){document.querySelectorAll('.diya-card').forEach(d=>d.classList.remove('lit'));updateCount()}
-const canvas=$('rangoliCanvas'),ctx=canvas.getContext('2d');let colour='#ffd34f',drawing=false,last=null;
-const colours=['#ffd34f','#ff6b6b','#ff8bc2','#b69cff','#69d8c5','#fff4d0','#f28b35','#ffffff','#7dd3fc','#a3e635'];
-const pal=$('palette');colours.forEach((c,i)=>{const b=document.createElement('button');b.className='swatch'+(i===0?' active':'');b.style.background=c;b.setAttribute('aria-label','Choose '+c);b.onclick=()=>{colour=c;document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active')};pal.appendChild(b)});
-function drawMandala(){ctx.clearRect(0,0,500,500);ctx.save();ctx.translate(250,250);for(let r=0;r<12;r++){ctx.rotate(Math.PI/6);for(let j=0;j<8;j++){ctx.beginPath();ctx.ellipse(0,-115,15,70,0,0,Math.PI*2);ctx.strokeStyle='rgba(255,216,120,.24)';ctx.lineWidth=2;ctx.stroke()}}ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);ctx.strokeStyle='rgba(255,216,120,.3)';ctx.lineWidth=2;ctx.stroke();ctx.restore()}
-drawMandala();
-function pos(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
-function startDraw(e){drawing=true;last=pos(e);canvas.setPointerCapture(e.pointerId);dot(last)}
-function dot(p){const size=+$('brush').value;ctx.beginPath();ctx.arc(p.x,p.y,size,0,Math.PI*2);ctx.fillStyle=colour;ctx.shadowColor=colour;ctx.shadowBlur=12;ctx.fill();ctx.shadowBlur=0}
-function moveDraw(e){if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.strokeStyle=colour;ctx.lineWidth=+$('brush').value*1.6;ctx.lineCap='round';ctx.shadowColor=colour;ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;dot(p);last=p}
-canvas.addEventListener('pointerdown',startDraw);canvas.addEventListener('pointermove',moveDraw);canvas.addEventListener('pointerup',()=>drawing=false);canvas.addEventListener('pointercancel',()=>drawing=false);
-function clearRangoli(){drawMandala()}
-function saveRangoli(){const a=document.createElement('a');a.download='my-digital-rangoli.png';a.href=canvas.toDataURL('image/png');a.click();toast('Your rangoli is downloaded!')}
+const canvas=$('rangoliCanvas'),ctx=canvas.getContext('2d');let colour='#ffd34f',drawing=false,last=null,eraser=false,pattern='mandala';
+  const colours=['#ffd34f','#ff6b6b','#ff8bc2','#b69cff','#69d8c5','#fff4d0','#f28b35','#ffffff','#7dd3fc','#a3e635'];
+  const patterns=[['mandala','Mandala'],['lotus','Lotus'],['flower','Flower'],['diamond','Diamond']];
+  const pal=$('palette');colours.forEach((c,i)=>{const b=document.createElement('button');b.className='swatch'+(i===0?' active':'');b.style.background=c;b.setAttribute('aria-label','Choose '+c);b.onclick=()=>{colour=c;eraser=false;updateEraser();document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active')};pal.appendChild(b)});
+  const picker=$('patternPicker');patterns.forEach(([id,label],i)=>{const b=document.createElement('button');b.className='pattern-btn'+(i===0?' active':'');b.textContent=label;b.setAttribute('aria-pressed',i===0);b.onclick=()=>{pattern=id;document.querySelectorAll('.pattern-btn').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-pressed','false')});b.classList.add('active');b.setAttribute('aria-pressed','true');drawPattern()};picker.appendChild(b)});
+  function drawPattern(){ctx.clearRect(0,0,500,500);ctx.save();ctx.translate(250,250);ctx.strokeStyle='rgba(255,216,120,.3)';ctx.lineWidth=2;
+    if(pattern==='lotus'||pattern==='flower'){const petals=pattern==='lotus'?8:12;for(let i=0;i<petals;i++){ctx.rotate(Math.PI*2/petals);ctx.beginPath();ctx.ellipse(0,-110,pattern==='lotus'?28:17,75,0,0,Math.PI*2);ctx.stroke()}}
+    if(pattern==='diamond'){for(let i=0;i<12;i++){ctx.rotate(Math.PI/6);ctx.beginPath();ctx.moveTo(0,-145);ctx.lineTo(24,-105);ctx.lineTo(0,-65);ctx.lineTo(-24,-105);ctx.closePath();ctx.stroke()}}
+    if(pattern==='mandala'||pattern==='flower'){for(let r=0;r<12;r++){ctx.rotate(Math.PI/6);for(let j=0;j<8;j++){ctx.beginPath();ctx.ellipse(0,-115,15,70,0,0,Math.PI*2);ctx.stroke()}}}
+    ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);ctx.stroke();ctx.restore()}
+  drawPattern();
+  function pos(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+  function updateEraser(){const b=$('eraserBtn');b.classList.toggle('active',eraser);b.setAttribute('aria-pressed',eraser);b.textContent=eraser?'Eraser on':'Eraser'}
+  function toggleEraser(){eraser=!eraser;updateEraser()}
+  function startDraw(e){e.preventDefault();drawing=true;last=pos(e);canvas.setPointerCapture(e.pointerId);dot(last)}
+  function dot(p){const size=+$('brush').value;ctx.save();ctx.globalCompositeOperation=eraser?'destination-out':'source-over';ctx.beginPath();ctx.arc(p.x,p.y,size,0,Math.PI*2);ctx.fillStyle=eraser?'#000':colour;ctx.shadowColor=eraser?'transparent':colour;ctx.shadowBlur=eraser?0:12;ctx.fill();ctx.restore()}
+  function moveDraw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.save();ctx.globalCompositeOperation=eraser?'destination-out':'source-over';ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.strokeStyle=eraser?'#000':colour;ctx.lineWidth=+$('brush').value*1.6;ctx.lineCap='round';ctx.shadowColor=eraser?'transparent':colour;ctx.shadowBlur=eraser?0:10;ctx.stroke();ctx.restore();dot(p);last=p}
+  canvas.addEventListener('pointerdown',startDraw);canvas.addEventListener('pointermove',moveDraw);canvas.addEventListener('pointerup',()=>drawing=false);canvas.addEventListener('pointercancel',()=>drawing=false);canvas.addEventListener('pointerleave',()=>drawing=false);
+  function clearRangoli(){drawPattern();eraser=false;updateEraser()}
+  function saveRangoli(){const a=document.createElement('a');a.download='my-digital-rangoli.png';a.href=canvas.toDataURL('image/png');a.click();toast('Your rangoli is downloaded!')}
 function launchFireworks(){const N=window.__lite?12:28;const area=$('fireworkArea');const rect=area.getBoundingClientRect();for(let k=0;k<5;k++){const x=30+Math.random()*(rect.width-60),y=25+Math.random()*100;const rocket=document.createElement('i');rocket.className='rocket';rocket.style.left=x+'px';area.appendChild(rocket);setTimeout(()=>{rocket.remove();for(let i=0;i<N;i++){const b=document.createElement('i');b.className='burst';b.style.left=x+'px';b.style.top=y+'px';const a=Math.PI*2*i/N,dist=35+Math.random()*65;b.style.setProperty('--x',Math.cos(a)*dist+'px');b.style.setProperty('--y',Math.sin(a)*dist+'px');b.style.background=['#ffe28b','#ff75a8','#ff9b42','#b6a0ff','#fff'][Math.floor(Math.random()*5)];area.appendChild(b);setTimeout(()=>b.remove(),1300)}},550+k*170)}toast('Happy Diwali! 🎆');window.fxShow&&fxShow(6)}
 let audioCtx=null,oscillators=[],musicOn=false,loopTimer=null;
 function toggleMusic(){if(musicOn){stopMusic();return}try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();musicOn=true;$('musicBtn').textContent='♫ Music: On';playTune()}catch(e){toast('Audio is not supported in this browser')}}
