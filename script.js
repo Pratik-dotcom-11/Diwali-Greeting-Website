@@ -89,13 +89,13 @@ if(!reduce){
  },{threshold:.15,rootMargin:'0px 0px -6% 0px'});
  /* section entrance animations: each section has its own style */
  const cfg=[
-  ['.hero>div:first-child>*','a-slide',3.5,.13],['.hero-art','a-zspin',3.7,0],
+  ['.hero>div:first-child>*','a-slide',0.2,.06],['.hero-art','a-zspin',0.25,0],
   ['#experience .section-head','a-drop',0,0],['#experience .feature','a-pop',0,.11],
   ['#greeting .section-head','a-zoom',0,0],['#greeting .two-col>.panel:not(.preview)','a-left',.1,0],['#greeting .preview','a-flip',.25,0],
   ['#photo-card .section-head','a-blurup',0,0],['#photo-card .photo-upload>.panel','a-clip',.1,0],['#photo-card .photo-preview','a-swing',.3,0],
   ['#diya .section-head','a-glow',0,0],['#diya .panel','a-unroll',.1,0],['#diya .diya-card','a-rise',.45,.1],
   ['#rangoli .section-head','a-tilt',0,0],['#rangoli .rangoli-layout','a-unroll',.1,0],['#rangoli .rangoli-wrap','a-spin',.55,0],['#rangoli .rangoli-layout>div:last-child','a-right',.75,0],['#rangoli .swatch','a-pop',1,.06],
-  ['.panel.celebrate','a-bounce',0,0],['.marquee','a-slide',4,0],['.ribbons','a-slide',0,0],['.team .section-head','a-glow',0,0],['.nexora','a-zoom',.15,0],['.team-card','a-flip',.35,.22],['footer','a-slide',0,0]];
+  ['.panel.celebrate','a-bounce',0,0],['.marquee','a-slide',0.4,0],['.ribbons','a-slide',0,0],['.team .section-head','a-glow',0,0],['.nexora','a-zoom',.15,0],['.team-card','a-flip',.35,.22],['footer','a-slide',0,0]];
  const clean=el=>{el.classList.remove('rv','in',el.dataset.a);el.style.removeProperty('--d')};
  cfg.forEach(([sel,a,base,st])=>document.querySelectorAll(sel).forEach(el=>{if(el.classList.contains('rv'))return;el.classList.add('rv');el.dataset.a=a;el.dataset.b=base;el.dataset.st=st;
   el.addEventListener('animationend',e=>{if(e.target===el&&el.classList.contains('in'))clean(el)});io.observe(el)}));
