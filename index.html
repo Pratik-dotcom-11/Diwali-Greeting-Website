@@ -14,7 +14,7 @@
 <div class="ambient"></div><div class="orb one"></div><div class="orb two"></div>
 <nav>
   <div class="brand"><div class="brand-mark">🪔</div><div>Digital Diya<small>Festival of Lights</small></div></div>
-  <div class="navlinks"><a href="#experience">Experience</a><a href="#greeting">Create greeting</a><a href="#photo-card">Photo card</a><a href="#rangoli">Rangoli</a><a href="#team">Team</a></div>
+  <div class="navlinks"><a href="#experience">Experience</a><a href="#greeting">Create greeting</a><a href="#rangoli">Rangoli</a><a href="#team">Team</a></div>
   <button class="nav-cta" onclick="document.querySelector('#greeting').scrollIntoView({behavior:'smooth'})">Create a wish ↗</button>
 </nav>
 <button class="music-toggle" id="musicBtn" onclick="toggleMusic()">♫ Music: Off</button>
@@ -56,7 +56,7 @@
    <label class="field sr-only" for="message">Your message</label><textarea id="message" placeholder="May your home be filled with light, laughter and love..." maxlength="240"></textarea><div class="char-count"><span id="messageCount">0</span>/240</div>
    <div class="step-heading style-heading"><span>3</span><h3>Pick a card style</h3></div><div class="style-swatches" role="group" aria-label="Card styles"><button type="button" class="style-swatch active" aria-label="Wine style"></button><button type="button" class="style-swatch rose" aria-label="Rose style"></button><button type="button" class="style-swatch blue" aria-label="Blue style"></button><button type="button" class="style-swatch amber" aria-label="Amber style"></button></div>
    <div class="actions"><button class="btn" onclick="generateGreeting()">Preview with sparkle</button><button class="small-btn" onclick="resetGreeting()">Reset</button></div>
-   <div class="share-heading">Share your greeting</div><button class="share-launch" onclick="openSharePopup()" aria-haspopup="dialog" aria-controls="sharePopup"><span class="share-launch-icon" aria-hidden="true">↗</span><span><strong>Send this greeting</strong><small>Choose where to share it</small></span><span class="share-launch-arrow" aria-hidden="true">→</span></button>
+   <button class="share-launch" onclick="openSharePopup()" aria-haspopup="dialog" aria-controls="sharePopup"><span class="share-launch-icon" aria-hidden="true">↗</span><span><strong>Send this greeting</strong><small>Choose where to share it</small></span><span class="share-launch-arrow" aria-hidden="true">→</span></button>
   </div>
   <div class="panel preview" id="greetingCard">
    <div class="mini">🪔 ✨ 🪔</div><div class="kicker">A wish for you</div><h3>Happy Diwali!</h3>
@@ -65,25 +65,6 @@
  </div>
 </section>
 
-<section class="content" id="photo-card">
- <div class="section-head"><div class="kicker">A memory wrapped in light</div><h2>Make a Diwali photo card</h2><p>Add your favourite picture, write a warm wish and create a festive card to download or share.</p></div>
- <div class="photo-upload">
-  <div class="panel">
-   <label class="field" for="photoInput">Choose a picture</label>
-   <div class="photo-drop"><div style="font-size:34px">🖼️</div><p style="font-weight:700;margin:8px 0;color:#ffe7a6">Upload your favourite photo</p><input id="photoInput" type="file" accept="image/*"><p class="photo-hint">Choose a photo from your phone or computer. JPG, PNG and other common image formats are supported.</p></div>
-   <label class="field" for="photoTo">To</label><input class="input" id="photoTo" placeholder="Someone special" maxlength="45">
-   <label class="field" for="photoMessage">Your Diwali wish</label><textarea id="photoMessage" maxlength="220" placeholder="Wishing you a Diwali filled with happiness, light and love!"></textarea>
-   <label class="field" for="photoFrom">From</label><input class="input" id="photoFrom" placeholder="Your name" maxlength="40">
-   <div class="photo-actions"><button class="btn" onclick="updatePhotoCard()">Update photo card ✨</button><button class="small-btn" onclick="downloadPhotoCard()">Download card ↓</button></div>
-   <div class="photo-actions"><button class="small-btn" onclick="sharePhotoCard()">Share card ↗</button></div>
-   <p class="photo-hint">Your photo is processed in your browser. Download the finished card, or use Share on a supported device.</p>
-  </div>
-  <div class="photo-preview" id="photoCardPreview">
-   <div class="photo-placeholder" id="photoPlaceholder">🪔 ✨ 🪔</div><img id="photoPreviewImage" alt="Your uploaded Diwali photo">
-   <div class="photo-card-copy"><div class="photo-spark">✦ ✧ ✦</div><h3>Happy Diwali!</h3><p id="photoPreviewTo">To someone special</p><p id="photoPreviewMessage">Wishing you a Diwali filled with happiness, light and love!</p><small id="photoPreviewFrom">With warm wishes</small><div class="photo-spark" style="margin-top:14px">🪔 ✨ 🪔</div></div>
-  </div>
- </div>
-</section>
 
 <section class="content" id="diya">
  <div class="section-head"><div class="kicker">A thousand little lights</div><h2>Light up the diyas</h2><p>Tap each diya to light it. Make the whole screen glow with festive warmth.</p></div>
