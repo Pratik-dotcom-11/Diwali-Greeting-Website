@@ -14,28 +14,167 @@ export default function DiwaliPage() {
   // State for Diya lighting
   const [litDiyas, setLitDiyas] = useState<boolean[]>(() => Array(10).fill(false));
 
-  // State for Music
-  const [musicOn, setMusicOn] = useState(false);
+  // State for Music & Ambient Light
+  const [musicOn, setMusicOn] = useState(true);
+  const [ambientDim, setAmbientDim] = useState(false);
+
+  // State for Team Member Profile Modal
+  const [selectedMember, setSelectedMember] = useState<"pratik" | "samragnyi" | null>(null);
+
+  const teamMembers = {
+    pratik: {
+      name: "Pratik Ghosh",
+      role: "Co-creator & Developer",
+      avatar: "PG",
+      bio: "Passionate developer, creative builder & tech enthusiast behind Nexora, crafting immersive web experiences.",
+      gmail: "pratikghosh161@gmail.com",
+      instagram: "https://www.instagram.com/_prytk__?exln=emVlZnFtMmRibms3",
+      github: "https://github.com/Pratik-dotcom-11",
+      linkedin: "https://www.linkedin.com/in/pratik-ghosh-255b0a32b?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+    },
+    samragnyi: {
+      name: "Samragnyi Bhowmick",
+      role: "Co-creator & Designer",
+      avatar: "SB",
+      bio: "Creative artist, UI craftsman and co-creator of Nexora, bringing soulful aesthetics and interactive beauty to digital art.",
+      gmail: "bhowmicksamragnyee@gmail.com",
+      instagram: "https://www.instagram.com/_littlechillbaby_?srtk=MWlmOGdhdGRrcTI5dw==",
+      github: "https://github.com/Samragnyi",
+      linkedin: "https://www.linkedin.com/in/samragnyi?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+    },
+  };
 
   // State for Rangoli
-  const [currentPattern, setCurrentPattern] = useState<"mandala" | "lotus" | "flower" | "diamond">("mandala");
+  const [currentPattern, setCurrentPattern] = useState<
+    "mandala" | "lotus" | "diya" | "star" | "peacock" | "sunburst" | "flower" | "diamond" | "chakra"
+  >("mandala");
   const [brushSize, setBrushSize] = useState(10);
   const [activeColour, setActiveColour] = useState("#ffd34f");
   const [isEraser, setIsEraser] = useState(false);
+  const [isDrawingActive, setIsDrawingActive] = useState(false);
 
   // State for Toast & Modal
   const [toastMsg, setToastMsg] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [surpriseOpen, setSurpriseOpen] = useState(false);
+  const [isCopiedBlessing, setIsCopiedBlessing] = useState(false);
+  const [confettiMode, setConfettiMode] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+
+  const confettiModeRef = useRef(false);
+  useEffect(() => {
+    confettiModeRef.current = confettiMode;
+  }, [confettiMode]);
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.body.classList.toggle("ambient-dimmed", ambientDim);
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        document.body.classList.remove("ambient-dimmed");
+      }
+    };
+  }, [ambientDim]);
+
+  // Ensure website always opens at the top hero section and disable browser scroll restoration
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+      const timer = setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Play opening firecrackers sound on website load
+  useEffect(() => {
+    const t = setTimeout(() => {
+      playCrackersSound(6800);
+    }, 250);
+    return () => {
+      clearTimeout(t);
+      stopCrackersSound();
+    };
+  }, []);
+
+  // Global button click sound effect listener
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const btn = target.closest(
+        "button, [role='button'], .btn, .small-btn, .nav-cta, .feature-btn, .swatch, .style-swatch, .pattern-btn, .action-btn, .rangoli-start-btn, .done-draw-btn, .surprise-btn"
+      );
+      if (btn) {
+        playButtonPopSound();
+      }
+    };
+
+    document.addEventListener("click", handleGlobalClick, { capture: true });
+    return () => {
+      document.removeEventListener("click", handleGlobalClick, { capture: true });
+    };
+  }, []);
+
+  // Auto-play background music on website entry with smooth fade-in and interaction recovery
+  useEffect(() => {
+    const audio = bgMusicRef.current;
+    if (!audio) return;
+
+    audio.volume = 0;
+    audio.play().then(() => {
+      setMusicOn(true);
+      let vol = 0;
+      const targetVol = 0.35;
+      const fadeIn = setInterval(() => {
+        vol = Math.min(targetVol, vol + 0.035);
+        audio.volume = vol;
+        if (vol >= targetVol) clearInterval(fadeIn);
+      }, 60);
+    }).catch(() => {
+      const startOnInteraction = () => {
+        if (bgMusicRef.current && bgMusicRef.current.paused) {
+          bgMusicRef.current.volume = 0;
+          bgMusicRef.current.play().then(() => {
+            setMusicOn(true);
+            let vol = 0;
+            const targetVol = 0.35;
+            const fadeIn = setInterval(() => {
+              vol = Math.min(targetVol, vol + 0.035);
+              if (bgMusicRef.current) bgMusicRef.current.volume = vol;
+              if (vol >= targetVol) clearInterval(fadeIn);
+            }, 60);
+          }).catch(() => {});
+        }
+        document.removeEventListener("pointerdown", startOnInteraction);
+      };
+      document.addEventListener("pointerdown", startOnInteraction, { once: true });
+    });
+  }, []);
 
   // Refs
   const fxCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const rangoliCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const patternCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const drawingCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const historyStackRef = useRef<ImageData[]>([]);
   const greetingCardRef = useRef<HTMLDivElement | null>(null);
   const fireworkAreaRef = useRef<HTMLDivElement | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const musicLoopRef = useRef<NodeJS.Timeout | null>(null);
+  const ambientCrackleRef = useRef<{
+    source: AudioBufferSourceNode;
+    gain: GainNode;
+    timeoutId: NodeJS.Timeout;
+  } | null>(null);
+  const crackersAudioRef = useRef<HTMLAudioElement | null>(null);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+  const fadeOutIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isDrawingRef = useRef(false);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -44,11 +183,27 @@ export default function DiwaliPage() {
     "#fff4d0", "#f28b35", "#ffffff", "#7dd3fc", "#a3e635"
   ];
 
-  const patterns: [("mandala" | "lotus" | "flower" | "diamond"), string][] = [
+  type RangoliPatternId =
+    | "mandala"
+    | "lotus"
+    | "diya"
+    | "star"
+    | "peacock"
+    | "sunburst"
+    | "flower"
+    | "diamond"
+    | "chakra";
+
+  const patterns: [RangoliPatternId, string][] = [
     ["mandala", "Mandala"],
     ["lotus", "Lotus"],
-    ["flower", "Flower"],
-    ["diamond", "Diamond"],
+    ["diya", "Diya Light"],
+    ["star", "Lakshmi Star"],
+    ["peacock", "Peacock"],
+    ["sunburst", "Surya Sun"],
+    ["flower", "Flower Bloom"],
+    ["diamond", "Diamond Kolam"],
+    ["chakra", "Sacred Chakra"],
   ];
 
   const showToastNotification = useCallback((msg: string) => {
@@ -60,45 +215,303 @@ export default function DiwaliPage() {
     }, 2300);
   }, []);
 
-  // Music Synth
+  // Ambient Light Toggle (Night mode)
+  const toggleAmbientLight = () => {
+    setAmbientDim((prev) => {
+      const next = !prev;
+      showToastNotification(
+        next
+          ? "🌙 Night mode on: Diyas glowing brighter!"
+          : "✨ Ambient light: Normal"
+      );
+      return next;
+    });
+  };
+
+  // Background Music Controller with smooth fade-in/out transition and balanced volume
   const toggleMusic = () => {
+    const audio = bgMusicRef.current;
+    if (!audio) return;
+
     if (musicOn) {
       setMusicOn(false);
-      if (musicLoopRef.current) clearTimeout(musicLoopRef.current);
-      return;
+      let vol = audio.volume;
+      const fadeInterval = setInterval(() => {
+        vol = Math.max(0, vol - 0.05);
+        audio.volume = vol;
+        if (vol <= 0.01) {
+          clearInterval(fadeInterval);
+          audio.pause();
+        }
+      }, 50);
+      showToastNotification("♫ Music: Off");
+    } else {
+      setMusicOn(true);
+      audio.volume = 0;
+      audio.play().then(() => {
+        let vol = 0;
+        const targetVol = 0.35;
+        const fadeInterval = setInterval(() => {
+          vol = Math.min(targetVol, vol + 0.04);
+          audio.volume = vol;
+          if (vol >= targetVol) {
+            clearInterval(fadeInterval);
+          }
+        }, 50);
+      }).catch(() => {
+        showToastNotification("Audio playback failed");
+      });
+      showToastNotification("♫ Music: On");
     }
+  };
+
+  // Stop continuous fireworks ambient crackling sound with a smooth fade-out
+  const stopAmbientCrackle = () => {
+    if (!ambientCrackleRef.current) return;
+    const currentCrackle = ambientCrackleRef.current;
+    ambientCrackleRef.current = null;
+    clearTimeout(currentCrackle.timeoutId);
 
     try {
+      if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
+        const now = audioCtxRef.current.currentTime;
+        currentCrackle.gain.gain.cancelScheduledValues(now);
+        currentCrackle.gain.gain.setValueAtTime(currentCrackle.gain.gain.value, now);
+        currentCrackle.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+        setTimeout(() => {
+          try {
+            currentCrackle.source.stop();
+            currentCrackle.source.disconnect();
+          } catch {
+            // Safe cleanup fallback
+          }
+        }, 600);
+      } else {
+        currentCrackle.source.stop();
+        currentCrackle.source.disconnect();
+      }
+    } catch {
+      // Safe cleanup fallback
+    }
+  };
+
+  // Continuous low-volume ambient crackling sound playing throughout the active fireworks display
+  const startAmbientCrackle = (durationMs = 6800) => {
+    try {
       if (!audioCtxRef.current) {
-        const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         audioCtxRef.current = new AudioCtxClass();
       }
       if (audioCtxRef.current.state === "suspended") {
         audioCtxRef.current.resume();
       }
-      setMusicOn(true);
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "closed") return;
 
-      const notes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
-      let i = 0;
-      const playNextNote = () => {
-        if (!audioCtxRef.current) return;
-        const osc = audioCtxRef.current.createOscillator();
-        const gain = audioCtxRef.current.createGain();
-        osc.type = "sine";
-        osc.frequency.value = notes[i % notes.length];
-        gain.gain.setValueAtTime(0.0001, audioCtxRef.current.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.045, audioCtxRef.current.currentTime + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtxRef.current.currentTime + 0.32);
-        osc.connect(gain);
-        gain.connect(audioCtxRef.current.destination);
-        osc.start();
-        osc.stop(audioCtxRef.current.currentTime + 0.34);
-        i++;
-        musicLoopRef.current = setTimeout(playNextNote, 390);
+      // If ambient crackling is already active, extend the countdown without creating redundant overlapping nodes
+      if (ambientCrackleRef.current) {
+        clearTimeout(ambientCrackleRef.current.timeoutId);
+        ambientCrackleRef.current.timeoutId = setTimeout(() => {
+          stopAmbientCrackle();
+        }, durationMs);
+        return;
+      }
+
+      // Procedural 2.5s looping sparkler crackle buffer: subtle pink noise bed with irregular micro-impulses
+      const bufferLength = Math.floor(ctx.sampleRate * 2.5);
+      const crackleBuffer = ctx.createBuffer(1, bufferLength, ctx.sampleRate);
+      const channel = crackleBuffer.getChannelData(0);
+
+      let lastOut = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const white = Math.random() * 2 - 1;
+        const pink = lastOut * 0.94 + white * 0.06;
+        lastOut = pink;
+
+        let spark = 0;
+        const rand = Math.random();
+        if (rand < 0.009) {
+          // Sharp sparkler ember pop
+          spark = (Math.random() * 2 - 1) * (0.5 + Math.random() * 0.5);
+        } else if (rand < 0.024) {
+          // Delicate sizzle grain
+          spark = (Math.random() * 2 - 1) * 0.22;
+        }
+
+        channel[i] = pink * 0.2 + spark * 0.8;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = crackleBuffer;
+      source.loop = true;
+
+      // Bandpass filter to sculpt into crisp, airy sparkler sizzle (~2800 Hz)
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(2800, ctx.currentTime);
+      filter.Q.setValueAtTime(1.8, ctx.currentTime);
+
+      // Low volume gain node with smooth fade-in
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.035, now + 0.35);
+
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      source.start(now);
+
+      const timeoutId = setTimeout(() => {
+        stopAmbientCrackle();
+      }, durationMs);
+
+      ambientCrackleRef.current = {
+        source,
+        gain,
+        timeoutId,
       };
-      playNextNote();
     } catch {
-      showToastNotification("Audio is not supported in this browser");
+      // Audio autoplay policy fallback
+    }
+  };
+
+  // Play uploaded firecrackers audio with professional fade-out transition
+  const playCrackersSound = (durationMs = 6800) => {
+    try {
+      const audio = crackersAudioRef.current;
+      if (!audio) return;
+
+      if (fadeOutIntervalRef.current) {
+        clearInterval(fadeOutIntervalRef.current);
+        fadeOutIntervalRef.current = null;
+      }
+
+      audio.currentTime = 0;
+      audio.volume = 0.85;
+      audio.play().catch(() => {
+        // Autoplay policy fallback
+      });
+
+      if (durationMs > 0) {
+        const fadeStart = Math.max(0, durationMs - 700);
+        setTimeout(() => {
+          if (!crackersAudioRef.current) return;
+          let vol = crackersAudioRef.current.volume;
+          const steps = 14;
+          const stepTime = 50;
+          const volStep = vol / steps;
+
+          fadeOutIntervalRef.current = setInterval(() => {
+            if (!crackersAudioRef.current) {
+              if (fadeOutIntervalRef.current) clearInterval(fadeOutIntervalRef.current);
+              return;
+            }
+            vol = Math.max(0, vol - volStep);
+            crackersAudioRef.current.volume = vol;
+            if (vol <= 0.02) {
+              if (fadeOutIntervalRef.current) clearInterval(fadeOutIntervalRef.current);
+              crackersAudioRef.current.pause();
+              crackersAudioRef.current.currentTime = 0;
+            }
+          }, stepTime);
+        }, fadeStart);
+      }
+    } catch {
+      // Audio playback safe fallback
+    }
+  };
+
+  const stopCrackersSound = () => {
+    try {
+      const audio = crackersAudioRef.current;
+      if (!audio) return;
+      if (fadeOutIntervalRef.current) {
+        clearInterval(fadeOutIntervalRef.current);
+        fadeOutIntervalRef.current = null;
+      }
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {
+      // Safe fallback
+    }
+  };
+
+  // Play smooth button click pop sound effect via Web Audio API
+  const playButtonPopSound = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "closed") return;
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(540, now);
+      osc.frequency.exponentialRampToValueAtTime(130, now + 0.042);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.06, now + 0.007);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.052);
+    } catch {
+      // Audio fallback
+    }
+  };
+
+  // Web Audio API gentle resonant chime for lighting an unlit diya
+  const playDiyaLightChime = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "closed") return;
+
+      const now = ctx.currentTime;
+      [587.33, 880, 1174.66].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+        gain.gain.setValueAtTime(0.0001, now + idx * 0.03);
+        gain.gain.linearRampToValueAtTime(0.05 - idx * 0.012, now + idx * 0.03 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.03 + 0.65);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + idx * 0.03);
+        osc.stop(now + idx * 0.03 + 0.7);
+      });
+    } catch {
+      // Audio fallback
     }
   };
 
@@ -132,7 +545,88 @@ export default function DiwaliPage() {
     setReceiver("");
     setMessage("");
     setPreviewTo("May your life shine brighter with every diya.");
-    setPreviewFrom("With warm wishes");
+  };
+
+  const playSacredChime = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const notes = [440, 554.37, 659.25, 830.61, 880, 1108.73];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + idx * 0.08 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.08 + 0.85);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.08);
+        osc.stop(ctx.currentTime + idx * 0.08 + 0.9);
+      });
+    } catch {
+      // Audio autoplay policy fallback
+    }
+  };
+
+  const handleOpenSurprise = () => {
+    setSurpriseOpen(true);
+    playSacredChime();
+    const fxShow = (window as unknown as { fxShow?: (n: number) => void }).fxShow;
+    if (fxShow) fxShow(4);
+  };
+
+  const handleCloseSurprise = () => {
+    setSurpriseOpen(false);
+  };
+
+  const blessingText = `May the sacred flame of the diya illuminate every shadowed corner of your path.
+
+In the gentle warmth of this festive night, may peace settle deep within your heart, may quiet hopes find their wings, and may eternal light guide your footsteps toward boundless grace, inner prosperity, and everlasting serenity.
+
+Shubh Deepavali to you and everyone you hold dear.`;
+
+  const handleCopyBlessing = async () => {
+    try {
+      await navigator.clipboard.writeText(blessingText);
+      setIsCopiedBlessing(true);
+      showToastNotification("Blessing copied to clipboard! 📜✨");
+      setTimeout(() => setIsCopiedBlessing(false), 2600);
+    } catch {
+      showToastNotification("Blessing ready to be read.");
+    }
+  };
+
+  const handleShareBlessing = () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const text = encodeURIComponent(
+      `🪔 *A Sacred Diwali Blessing for You* 📜✨\n\n"${blessingText}"\n\nCelebrate with Diwali Digital Diya: ${url}`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+  };
+
+  const handleToggleConfettiMode = () => {
+    const next = !confettiMode;
+    setConfettiMode(next);
+    if (next) {
+      showToastNotification("🎉 Golden Confetti Mode ON! Shower will cascade during fireworks ✨");
+      playSacredChime();
+      const startShower = (window as unknown as { startConfettiShower?: (d?: number) => void }).startConfettiShower;
+      if (startShower) startShower(3500);
+    } else {
+      showToastNotification("Confetti Mode turned off.");
+      const stopShower = (window as unknown as { stopConfettiShower?: () => void }).stopConfettiShower;
+      if (stopShower) stopShower();
+    }
   };
 
   const getShareUrl = () => {
@@ -297,12 +791,18 @@ export default function DiwaliPage() {
   const handleToggleDiya = (index: number) => {
     setLitDiyas((prev) => {
       const next = [...prev];
-      next[index] = !next[index];
+      const willBeLit = !next[index];
+      next[index] = willBeLit;
+      if (willBeLit) {
+        playDiyaLightChime();
+      }
       const count = next.filter(Boolean).length;
       if (count === 10) {
         showToastNotification("A beautiful circle of light!");
         const fxShow = (window as unknown as { fxShow?: (n: number) => void }).fxShow;
         if (fxShow) fxShow(5);
+        startAmbientCrackle(6000);
+        playCrackersSound(6000);
       }
       return next;
     });
@@ -320,6 +820,8 @@ export default function DiwaliPage() {
           showToastNotification("A beautiful circle of light!");
           const fxShow = (window as unknown as { fxShow?: (n: number) => void }).fxShow;
           if (fxShow) fxShow(5);
+          startAmbientCrackle(6000);
+          playCrackersSound(6000);
         }
       }, i * 140);
     });
@@ -329,9 +831,9 @@ export default function DiwaliPage() {
     setLitDiyas(Array(10).fill(false));
   };
 
-  // Rangoli drawing logic
-  const drawRangoliPattern = useCallback((pat: "mandala" | "lotus" | "flower" | "diamond") => {
-    const canvas = rangoliCanvasRef.current;
+  // Rangoli drawing logic - Draw guide pattern onto patternCanvas
+  const drawRangoliPattern = useCallback((pat: string) => {
+    const canvas = patternCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -339,48 +841,178 @@ export default function DiwaliPage() {
     ctx.clearRect(0, 0, 500, 500);
     ctx.save();
     ctx.translate(250, 250);
-    ctx.strokeStyle = "rgba(255,216,120,.3)";
+    ctx.strokeStyle = "rgba(255, 218, 120, 0.44)";
     ctx.lineWidth = 2;
+    ctx.shadowColor = "#ffb52e";
+    ctx.shadowBlur = 4;
 
-    if (pat === "lotus" || pat === "flower") {
-      const petals = pat === "lotus" ? 8 : 12;
-      for (let i = 0; i < petals; i++) {
-        ctx.rotate((Math.PI * 2) / petals);
-        ctx.beginPath();
-        ctx.ellipse(0, -110, pat === "lotus" ? 28 : 17, 75, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-    }
-    if (pat === "diamond") {
+    if (pat === "mandala") {
+      ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 54, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 102, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 210, 0, Math.PI * 2); ctx.stroke();
       for (let i = 0; i < 12; i++) {
         ctx.rotate(Math.PI / 6);
         ctx.beginPath();
-        ctx.moveTo(0, -145);
-        ctx.lineTo(24, -105);
-        ctx.lineTo(0, -65);
-        ctx.lineTo(-24, -105);
+        ctx.ellipse(0, -78, 16, 26, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate(Math.PI / 6);
+        ctx.beginPath();
+        ctx.moveTo(-22, -160);
+        ctx.quadraticCurveTo(0, -210, 0, -210);
+        ctx.quadraticCurveTo(0, -210, 22, -160);
+        ctx.stroke();
+      }
+    } else if (pat === "lotus") {
+      ctx.beginPath(); ctx.arc(0, 0, 36, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 8; i++) {
+        ctx.rotate((Math.PI * 2) / 8);
+        ctx.beginPath();
+        ctx.moveTo(0, -36);
+        ctx.bezierCurveTo(-45, -95, -42, -185, 0, -218);
+        ctx.bezierCurveTo(42, -185, 45, -95, 0, -36);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -36);
+        ctx.lineTo(0, -200);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 8; i++) {
+        ctx.rotate(Math.PI / 8);
+        ctx.beginPath();
+        ctx.ellipse(0, -96, 18, 48, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.rotate(Math.PI / 8);
+      }
+    } else if (pat === "diya") {
+      // Center Diya
+      ctx.beginPath();
+      ctx.ellipse(0, 12, 48, 24, 0, 0, Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-16, 12);
+      ctx.quadraticCurveTo(0, -60, 0, -60);
+      ctx.quadraticCurveTo(0, -60, 16, 12);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 85, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 135, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 8; i++) {
+        ctx.rotate((Math.PI * 2) / 8);
+        ctx.beginPath();
+        ctx.ellipse(0, -155, 26, 13, 0, 0, Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-10, -155);
+        ctx.quadraticCurveTo(0, -200, 0, -200);
+        ctx.quadraticCurveTo(0, -200, 10, -155);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -85);
+        ctx.lineTo(0, -140);
+        ctx.stroke();
+      }
+    } else if (pat === "peacock") {
+      ctx.beginPath(); ctx.arc(0, 0, 42, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 78, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        ctx.rotate((Math.PI * 2) / 6);
+        ctx.beginPath();
+        ctx.moveTo(0, -78);
+        ctx.bezierCurveTo(-65, -120, -58, -200, 0, -220);
+        ctx.bezierCurveTo(58, -200, 65, -120, 0, -78);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -165, 22, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -165, 10, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else if (pat === "star") {
+      ctx.beginPath(); ctx.arc(0, 0, 45, 0, Math.PI * 2); ctx.stroke();
+      const s = 145;
+      ctx.strokeRect(-s, -s, s * 2, s * 2);
+      ctx.save();
+      ctx.rotate(Math.PI / 4);
+      ctx.strokeRect(-s, -s, s * 2, s * 2);
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(0, 0, 215, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 8; i++) {
+        ctx.rotate((Math.PI * 2) / 8);
+        ctx.beginPath();
+        ctx.arc(0, -205, 12, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else if (pat === "sunburst") {
+      ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 85, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 138, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 16; i++) {
+        ctx.rotate((Math.PI * 2) / 16);
+        ctx.beginPath();
+        ctx.moveTo(-14, -138);
+        ctx.lineTo(0, -220);
+        ctx.lineTo(14, -138);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -110, 6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else if (pat === "flower") {
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate((Math.PI * 2) / 12);
+        ctx.beginPath();
+        ctx.ellipse(0, -115, 22, 85, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(0, -65, 12, 35, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(0, 0, 42, 0, Math.PI * 2); ctx.stroke();
+    } else if (pat === "diamond") {
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate(Math.PI / 6);
+        ctx.beginPath();
+        ctx.moveTo(0, -195);
+        ctx.lineTo(32, -140);
+        ctx.lineTo(0, -85);
+        ctx.lineTo(-32, -140);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -140);
+        ctx.lineTo(18, -100);
+        ctx.lineTo(0, -60);
+        ctx.lineTo(-18, -100);
         ctx.closePath();
         ctx.stroke();
       }
-    }
-    if (pat === "mandala" || pat === "flower") {
-      for (let r = 0; r < 12; r++) {
-        ctx.rotate(Math.PI / 6);
-        for (let j = 0; j < 8; j++) {
-          ctx.beginPath();
-          ctx.ellipse(0, -115, 15, 70, 0, 0, Math.PI * 2);
-          ctx.stroke();
-        }
+      ctx.beginPath(); ctx.arc(0, 0, 45, 0, Math.PI * 2); ctx.stroke();
+    } else if (pat === "chakra") {
+      ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 68, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 215, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 16; i++) {
+        ctx.rotate((Math.PI * 2) / 16);
+        ctx.beginPath();
+        ctx.moveTo(0, -68);
+        ctx.lineTo(0, -160);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -188, 16, Math.PI * 0.15, Math.PI * 0.85);
+        ctx.stroke();
       }
     }
-    ctx.beginPath();
-    ctx.arc(0, 0, 42, 0, Math.PI * 2);
-    ctx.stroke();
+
     ctx.restore();
   }, []);
 
   const getCanvasPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = rangoliCanvasRef.current;
+    const canvas = drawingCanvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const r = canvas.getBoundingClientRect();
     return {
@@ -389,8 +1021,41 @@ export default function DiwaliPage() {
     };
   };
 
+  const saveHistorySnapshot = () => {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    try {
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      historyStackRef.current.push(data);
+      if (historyStackRef.current.length > 20) {
+        historyStackRef.current.shift();
+      }
+    } catch {
+      // Ignore if image data reading fails
+    }
+  };
+
+  const handleUndo = () => {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    if (historyStackRef.current.length > 0) {
+      const prev = historyStackRef.current.pop();
+      if (prev) {
+        ctx.putImageData(prev, 0, 0);
+        showToastNotification("Undid last stroke");
+        return;
+      }
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    showToastNotification("Canvas cleared");
+  };
+
   const drawDot = (p: { x: number; y: number }) => {
-    const canvas = rangoliCanvasRef.current;
+    const canvas = drawingCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -399,7 +1064,7 @@ export default function DiwaliPage() {
     ctx.globalCompositeOperation = isEraser ? "destination-out" : "source-over";
     ctx.beginPath();
     ctx.arc(p.x, p.y, brushSize, 0, Math.PI * 2);
-    ctx.fillStyle = isEraser ? "#000" : activeColour;
+    ctx.fillStyle = isEraser ? "rgba(0,0,0,1)" : activeColour;
     ctx.shadowColor = isEraser ? "transparent" : activeColour;
     ctx.shadowBlur = isEraser ? 0 : 12;
     ctx.fill();
@@ -407,8 +1072,10 @@ export default function DiwaliPage() {
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawingActive) return;
     e.preventDefault();
     isDrawingRef.current = true;
+    saveHistorySnapshot();
     const p = getCanvasPos(e);
     lastPosRef.current = p;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -416,9 +1083,9 @@ export default function DiwaliPage() {
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawingRef.current || !lastPosRef.current) return;
+    if (!isDrawingActive || !isDrawingRef.current || !lastPosRef.current) return;
     e.preventDefault();
-    const canvas = rangoliCanvasRef.current;
+    const canvas = drawingCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -429,7 +1096,7 @@ export default function DiwaliPage() {
     ctx.beginPath();
     ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = isEraser ? "#000" : activeColour;
+    ctx.strokeStyle = isEraser ? "rgba(0,0,0,1)" : activeColour;
     ctx.lineWidth = brushSize * 1.6;
     ctx.lineCap = "round";
     ctx.shadowColor = isEraser ? "transparent" : activeColour;
@@ -445,30 +1112,202 @@ export default function DiwaliPage() {
     isDrawingRef.current = false;
   };
 
-  const handleClearRangoli = () => {
-    drawRangoliPattern(currentPattern);
+  const handleClearDrawing = () => {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    saveHistorySnapshot();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     setIsEraser(false);
+    showToastNotification("Paint cleared! Pattern preserved.");
   };
 
   const handleSaveRangoli = () => {
-    const canvas = rangoliCanvasRef.current;
-    if (!canvas) return;
+    const patCanvas = patternCanvasRef.current;
+    const drawCanvas = drawingCanvasRef.current;
+    if (!patCanvas || !drawCanvas) return;
+
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = 500;
+    exportCanvas.height = 500;
+    const expCtx = exportCanvas.getContext("2d");
+    if (!expCtx) return;
+
+    // Dark festive background
+    expCtx.fillStyle = "#250514";
+    expCtx.fillRect(0, 0, 500, 500);
+
+    // Decorative border
+    expCtx.strokeStyle = "rgba(255, 218, 120, 0.6)";
+    expCtx.lineWidth = 3;
+    expCtx.strokeRect(14, 14, 472, 472);
+    expCtx.strokeStyle = "rgba(255, 218, 120, 0.3)";
+    expCtx.lineWidth = 1;
+    expCtx.strokeRect(22, 22, 456, 456);
+
+    // Composite pattern underneath
+    expCtx.drawImage(patCanvas, 0, 0);
+
+    // Composite user paint on top
+    expCtx.drawImage(drawCanvas, 0, 0);
+
+    // Watermark
+    expCtx.font = "700 12px Arial";
+    expCtx.fillStyle = "rgba(255, 218, 120, 0.75)";
+    expCtx.textAlign = "center";
+    expCtx.fillText("SHUBH DEEPAVALI • DIGITAL RANGOLI", 250, 486);
+
     const a = document.createElement("a");
-    a.download = "my-digital-rangoli.png";
-    a.href = canvas.toDataURL("image/png");
+    a.download = `my-diwali-rangoli-${currentPattern}.png`;
+    a.href = exportCanvas.toDataURL("image/png");
     a.click();
     showToastNotification("Your rangoli is downloaded!");
+  };
+
+  // Web Audio API Festive Fireworks Sound Synthesizer
+  const playFireworkRocketSound = (detonationDelayMs: number) => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+
+      // 1. Ascending Rocket Whistle / Whoosh
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      const startFreq = 380 + Math.random() * 80;
+      const endFreq = 1200 + Math.random() * 200;
+
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.95);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.045, now + 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.05);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.1);
+
+      // 2. Detonation Boom & Crackle at explosion point
+      setTimeout(() => {
+        try {
+          if (ctx.state === "closed") return;
+          const burstNow = ctx.currentTime;
+
+          // Low-frequency deep resonant boom
+          const boom = ctx.createOscillator();
+          const boomGain = ctx.createGain();
+          boom.type = "sine";
+          boom.frequency.setValueAtTime(160 + Math.random() * 40, burstNow);
+          boom.frequency.exponentialRampToValueAtTime(28, burstNow + 0.35);
+
+          boomGain.gain.setValueAtTime(0.22, burstNow);
+          boomGain.gain.exponentialRampToValueAtTime(0.001, burstNow + 0.38);
+
+          boom.connect(boomGain);
+          boomGain.connect(ctx.destination);
+          boom.start(burstNow);
+          boom.stop(burstNow + 0.4);
+
+          // Sparkling crackle flurry (filtered noise)
+          const bufferSize = Math.floor(ctx.sampleRate * 0.4);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.12));
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(2200 + Math.random() * 600, burstNow);
+          filter.Q.setValueAtTime(2.5, burstNow);
+
+          const noiseGain = ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.18, burstNow);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, burstNow + 0.36);
+
+          noise.connect(filter);
+          filter.connect(noiseGain);
+          noiseGain.connect(ctx.destination);
+
+          noise.start(burstNow);
+          noise.stop(burstNow + 0.4);
+        } catch {
+          // Audio cleanup safe fallback
+        }
+      }, detonationDelayMs);
+    } catch {
+      // Audio autoplay policy fallback
+    }
   };
 
   // Fireworks launcher in section
   const handleLaunchFireworks = () => {
     const area = fireworkAreaRef.current;
     if (!area) return;
+
+    // Start continuous low-volume ambient crackling sound throughout active fireworks display
+    startAmbientCrackle(6800);
+    playCrackersSound(6800);
+
+    // Trigger persistent golden confetti shower if Confetti Mode is active
+    if (confettiModeRef.current) {
+      const startShower = (window as unknown as { startConfettiShower?: (d?: number) => void }).startConfettiShower;
+      if (startShower) startShower(14000);
+    }
+
+    // Celebratory initial fanfare chime
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+      [587.33, 739.99, 880, 1174.66].forEach((f, idx) => {
+        const chime = ctx.createOscillator();
+        const chimeGain = ctx.createGain();
+        chime.type = "sine";
+        chime.frequency.setValueAtTime(f, now + idx * 0.06);
+        chimeGain.gain.setValueAtTime(0.001, now + idx * 0.06);
+        chimeGain.gain.exponentialRampToValueAtTime(0.08, now + idx * 0.06 + 0.02);
+        chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 0.5);
+        chime.connect(chimeGain);
+        chimeGain.connect(ctx.destination);
+        chime.start(now + idx * 0.06);
+        chime.stop(now + idx * 0.06 + 0.55);
+      });
+    } catch {
+      // Audio fallback
+    }
+
     const isLite = (window as unknown as { __lite?: boolean }).__lite;
     const N = isLite ? 12 : 28;
     const rect = area.getBoundingClientRect();
 
     for (let k = 0; k < 5; k++) {
+      const delay = 1200 + k * 520;
+      playFireworkRocketSound(delay);
+
       const x = 30 + Math.random() * (rect.width - 60);
       const y = 25 + Math.random() * 100;
       const rocket = document.createElement("i");
@@ -493,7 +1332,7 @@ export default function DiwaliPage() {
           area.appendChild(b);
           setTimeout(() => b.remove(), 1300);
         }
-      }, 1200 + k * 520);
+      }, delay);
     }
     showToastNotification("Happy Diwali! 🎆");
     const fxShow = (window as unknown as { fxShow?: (n: number) => void }).fxShow;
@@ -534,6 +1373,22 @@ export default function DiwaliPage() {
       ty: number;
       p: string[];
     }> = [];
+    let confettis: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      rot: number;
+      rotSpeed: number;
+      w: number;
+      h: number;
+      col: string;
+      wobble: number;
+      wobbleSpeed: number;
+      opacity: number;
+    }> = [];
+    let confettiShowerActive = false;
+    let confettiShowerTimer: NodeJS.Timeout | null = null;
     let running = false;
     let lw = 0;
 
@@ -651,8 +1506,61 @@ export default function DiwaliPage() {
         return true;
       });
 
+      // Persistent Golden Confetti Particle Shower
+      if (confettiShowerActive && confettis.length < (isLite() ? 65 : 155)) {
+        for (let i = 0; i < (isLite() ? 2 : 5); i++) {
+          confettis.push({
+            x: rnd(0, W),
+            y: rnd(-40, -10),
+            vx: rnd(-0.9, 0.9),
+            vy: rnd(1.8, 3.8),
+            rot: rnd(0, Math.PI * 2),
+            rotSpeed: rnd(-0.08, 0.08),
+            w: rnd(8, 14),
+            h: rnd(5, 10),
+            col: ["#ffe885", "#ffd23f", "#f59e0b", "#fff8db", "#fcd34d", "#fef08a"][
+              Math.floor(rnd(0, 6))
+            ],
+            wobble: rnd(0, 10),
+            wobbleSpeed: rnd(0.04, 0.08),
+            opacity: 1,
+          });
+        }
+      }
+
+      if (confettis.length) {
+        c.globalCompositeOperation = "source-over";
+        confettis = confettis.filter((cf) => {
+          cf.y += cf.vy;
+          cf.wobble += cf.wobbleSpeed;
+          cf.x += cf.vx + Math.sin(cf.wobble) * 1.1;
+          cf.rot += cf.rotSpeed;
+
+          if (cf.y > H + 25) {
+            if (confettiShowerActive) {
+              cf.y = rnd(-35, -10);
+              cf.x = rnd(0, W);
+              return true;
+            }
+            return false;
+          }
+
+          c.save();
+          c.translate(cf.x, cf.y);
+          c.rotate(cf.rot);
+          c.scale(Math.cos(cf.rot * 1.3), 1);
+          c.fillStyle = cf.col;
+          c.globalAlpha = Math.max(0, Math.min(1, cf.opacity));
+          c.fillRect(-cf.w / 2, -cf.h / 2, cf.w, cf.h);
+          c.restore();
+
+          return true;
+        });
+        c.globalCompositeOperation = "lighter";
+      }
+
       c.globalAlpha = 1;
-      if (parts.length || rockets.length) {
+      if (parts.length || rockets.length || confettis.length || confettiShowerActive) {
         requestAnimationFrame(loop);
       } else {
         running = false;
@@ -692,9 +1600,47 @@ export default function DiwaliPage() {
       if (!reduce) burst(x, y);
     };
 
+    const startConfettiShower = (durationMs = 14000) => {
+      if (reduce) return;
+      confettiShowerActive = true;
+      go();
+      if (confettiShowerTimer) clearTimeout(confettiShowerTimer);
+      confettiShowerTimer = setTimeout(() => {
+        confettiShowerActive = false;
+      }, durationMs);
+    };
+
+    const stopConfettiShower = () => {
+      confettiShowerActive = false;
+      if (confettiShowerTimer) clearTimeout(confettiShowerTimer);
+      confettis = [];
+    };
+
     // Attach to window
-    (window as unknown as { fxShow?: typeof fxShow; fxBurst?: typeof fxBurst }).fxShow = fxShow;
-    (window as unknown as { fxShow?: typeof fxShow; fxBurst?: typeof fxBurst }).fxBurst = fxBurst;
+    (window as unknown as {
+      fxShow?: typeof fxShow;
+      fxBurst?: typeof fxBurst;
+      startConfettiShower?: typeof startConfettiShower;
+      stopConfettiShower?: typeof stopConfettiShower;
+    }).fxShow = fxShow;
+    (window as unknown as {
+      fxShow?: typeof fxShow;
+      fxBurst?: typeof fxBurst;
+      startConfettiShower?: typeof startConfettiShower;
+      stopConfettiShower?: typeof stopConfettiShower;
+    }).fxBurst = fxBurst;
+    (window as unknown as {
+      fxShow?: typeof fxShow;
+      fxBurst?: typeof fxBurst;
+      startConfettiShower?: typeof startConfettiShower;
+      stopConfettiShower?: typeof stopConfettiShower;
+    }).startConfettiShower = startConfettiShower;
+    (window as unknown as {
+      fxShow?: typeof fxShow;
+      fxBurst?: typeof fxBurst;
+      startConfettiShower?: typeof startConfettiShower;
+      stopConfettiShower?: typeof stopConfettiShower;
+    }).stopConfettiShower = stopConfettiShower;
 
     // Opening show
     if (!reduce) {
@@ -856,12 +1802,13 @@ export default function DiwaliPage() {
 
     // Auto removal of intro veil after timeout
     const introTimer = setTimeout(() => {
-      document.querySelectorAll(".intro-veil,.intro-greet").forEach((e) => e.remove());
+      setShowIntro(false);
     }, 6800);
 
     return () => {
       cancelRibbonTick = true;
       clearTimeout(introTimer);
+      stopAmbientCrackle();
       document.querySelectorAll(".floater").forEach((f) => f.remove());
     };
   }, [currentPattern, drawRangoliPattern]);
@@ -870,17 +1817,32 @@ export default function DiwaliPage() {
 
   return (
     <>
+      <audio
+        ref={crackersAudioRef}
+        src="/assets/aistudio/Crackers_1f4b6b0f.mpeg"
+        preload="auto"
+      />
+      <audio
+        ref={bgMusicRef}
+        src="/assets/aistudio/Music_diwali_site_eee8af26.mpeg"
+        loop
+        preload="auto"
+      />
       <canvas id="fxCanvas" ref={fxCanvasRef} aria-hidden="true" />
-      <div className="intro-veil" aria-hidden="true" />
-      <div className="intro-greet" id="introGreet" aria-hidden="true">
-        <div className="lamp">🪔</div>
-        <h2>Shubh Deepavali</h2>
-        <p>Happy Diwali</p>
-        <p className="by">✦ A Nexora creation ✦</p>
-      </div>
-      <div className="ambient" />
-      <div className="orb one" />
-      <div className="orb two" />
+      {showIntro && (
+        <>
+          <div className="intro-veil" aria-hidden="true" />
+          <div className="intro-greet" id="introGreet" aria-hidden="true">
+            <div className="lamp">🪔</div>
+            <h2>Shubh Deepavali</h2>
+            <p>Happy Diwali</p>
+            <p className="by">✦ A Nexora creation ✦</p>
+          </div>
+        </>
+      )}
+      <div className={`ambient ${ambientDim ? "dimmed" : ""}`} />
+      <div className={`orb one ${ambientDim ? "dimmed" : ""}`} />
+      <div className={`orb two ${ambientDim ? "dimmed" : ""}`} />
 
       {/* Navigation */}
       <nav>
@@ -893,8 +1855,11 @@ export default function DiwaliPage() {
         </div>
         <div className="navlinks">
           <a href="#experience">Experience</a>
+          <a href="#diya">Diyas</a>
           <a href="#greeting">Create greeting</a>
           <a href="#rangoli">Rangoli</a>
+          <a href="#blessing">Blessing</a>
+          <a href="#celebrate">Fireworks</a>
           <a href="#team">Team</a>
         </div>
         <button
@@ -905,10 +1870,27 @@ export default function DiwaliPage() {
         </button>
       </nav>
 
-      {/* Music Toggle */}
-      <button className="music-toggle" id="musicBtn" onClick={toggleMusic}>
-        ♫ Music: {musicOn ? "On" : "Off"}
-      </button>
+      {/* Quick Controls: Ambient Light & Music */}
+      <div className="quick-toggles" aria-label="Festive controls">
+        <button
+          className={`ambient-toggle ${ambientDim ? "active" : ""}`}
+          id="ambientBtn"
+          onClick={toggleAmbientLight}
+          aria-pressed={ambientDim}
+          title="Toggle night-time ambient lighting"
+        >
+          {ambientDim ? "🌙 Ambient light: Night" : "✨ Ambient light: Normal"}
+        </button>
+        <button
+          className="music-toggle"
+          id="musicBtn"
+          onClick={toggleMusic}
+          aria-pressed={musicOn}
+          title="Toggle festive melody"
+        >
+          ♫ Music: {musicOn ? "On" : "Off"}
+        </button>
+      </div>
 
       {/* Hero Section */}
       <header className="hero" id="top">
@@ -1042,35 +2024,182 @@ export default function DiwaliPage() {
           <p>A playful celebration with little moments you can interact with, personalise and share.</p>
         </div>
         <div className="feature-grid">
-          <article className="feature">
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              document.querySelector("#diya")?.scrollIntoView({ behavior: "smooth" });
+              showToastNotification("Tap any diya to light it! ✨");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.querySelector("#diya")?.scrollIntoView({ behavior: "smooth" });
+                showToastNotification("Tap any diya to light it! ✨");
+              }
+            }}
+            aria-label="Go to Diya lighting section"
+          >
             <div className="icon">🪔</div>
             <h3>Light a diya</h3>
             <p>Tap the lamps and watch their warm flames glow. Each light adds to the celebration.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.querySelector("#diya")?.scrollIntoView({ behavior: "smooth" });
+                showToastNotification("Tap any diya to light it! ✨");
+              }}
+            >
+              Light diyas ↗
+            </button>
           </article>
-          <article className="feature">
+
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={() => document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            aria-label="Go to greeting card builder section"
+          >
             <div className="icon">💌</div>
             <h3>Personal greetings</h3>
             <p>Write a wish for someone special and create a greeting card with their name.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Create wish ↗
+            </button>
           </article>
-          <article className="feature">
+
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={() => document.querySelector("#rangoli")?.scrollIntoView({ behavior: "smooth" })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.querySelector("#rangoli")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            aria-label="Go to digital rangoli canvas section"
+          >
             <div className="icon">🌸</div>
             <h3>Digital rangoli</h3>
             <p>Choose colours and draw your own festive pattern on an interactive canvas.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.querySelector("#rangoli")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Draw rangoli ↗
+            </button>
           </article>
-          <article className="feature">
+
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={() => document.querySelector("#celebrate")?.scrollIntoView({ behavior: "smooth" })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.querySelector("#celebrate")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            aria-label="Go to fireworks celebration section"
+          >
             <div className="icon">🎆</div>
             <h3>Fireworks</h3>
             <p>Launch a burst of colourful celebration with a click of the button.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.querySelector("#celebrate")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Launch fireworks ↗
+            </button>
           </article>
-          <article className="feature">
+
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={toggleMusic}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleMusic();
+              }
+            }}
+            aria-label="Toggle festive background melody"
+          >
             <div className="icon">🎵</div>
             <h3>Festive sounds</h3>
             <p>Turn on a gentle generated melody while you explore the celebration.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleMusic();
+              }}
+            >
+              {musicOn ? "♫ Stop melody" : "♫ Play melody"}
+            </button>
           </article>
-          <article className="feature">
+
+          <article
+            className="feature"
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" });
+              setShareOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" });
+                setShareOpen(true);
+              }
+            }}
+            aria-label="Open greeting share sheet"
+          >
             <div className="icon">📲</div>
             <h3>Share the joy</h3>
             <p>Copy your greeting or share it through WhatsApp with friends and family.</p>
+            <button
+              type="button"
+              className="feature-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.querySelector("#greeting")?.scrollIntoView({ behavior: "smooth" });
+                setShareOpen(true);
+              }}
+            >
+              Share wish ↗
+            </button>
           </article>
         </div>
       </section>
@@ -1361,25 +2490,88 @@ export default function DiwaliPage() {
         <div className="section-head">
           <div className="kicker">Your digital art corner</div>
           <h2>Create a little rangoli</h2>
-          <p>Pick a colour, then tap or drag on the canvas to make your own festive design.</p>
+          <p>
+            Choose a festive traditional pattern, pick your gulal colors, and draw your masterpiece.
+          </p>
         </div>
         <div className="panel rangoli-layout">
           <div className="rangoli-wrap">
-            <canvas
-              id="rangoliCanvas"
-              ref={rangoliCanvasRef}
-              width={500}
-              height={500}
-              aria-label="Interactive rangoli drawing canvas"
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
-              onPointerLeave={handlePointerUp}
-            />
+            <div className="rangoli-stack">
+              {/* Pattern Guide Layer (Always preserved underneath, never erased) */}
+              <canvas
+                ref={patternCanvasRef}
+                width={500}
+                height={500}
+                className="rangoli-pattern-canvas"
+                aria-hidden="true"
+              />
+
+              {/* User Drawing Layer (On top, erased without affecting the guide pattern) */}
+              <canvas
+                id="rangoliCanvas"
+                ref={drawingCanvasRef}
+                width={500}
+                height={500}
+                className={`rangoli-draw-canvas ${
+                  isDrawingActive ? (isEraser ? "eraser-enabled" : "drawing-enabled") : ""
+                }`}
+                aria-label="Interactive rangoli drawing canvas"
+                style={{
+                  touchAction: isDrawingActive ? "none" : "pan-y",
+                  cursor: isDrawingActive ? (isEraser ? "cell" : "crosshair") : "default",
+                }}
+                onPointerDown={isDrawingActive ? handlePointerDown : undefined}
+                onPointerMove={isDrawingActive ? handlePointerMove : undefined}
+                onPointerUp={isDrawingActive ? handlePointerUp : undefined}
+                onPointerCancel={isDrawingActive ? handlePointerUp : undefined}
+                onPointerLeave={isDrawingActive ? handlePointerUp : undefined}
+              />
+
+              {/* Active drawing status bar with quick exit/scroll toggle */}
+              {isDrawingActive && (
+                <div className="rangoli-status-bar">
+                  <span className="status-pill">
+                    <span className="status-dot" />
+                    {isEraser ? "🧹 Eraser Active" : "🖌️ Drawing Mode"}
+                  </span>
+                  <button
+                    type="button"
+                    className="done-draw-btn"
+                    onClick={() => {
+                      setIsDrawingActive(false);
+                      showToastNotification("Drawing paused. Page scroll enabled!");
+                    }}
+                  >
+                    ✓ Done / Enable Scroll
+                  </button>
+                </div>
+              )}
+
+              {/* Mobile Scroll Protection Overlay */}
+              {!isDrawingActive && (
+                <div className="rangoli-overlay">
+                  <div className="overlay-icon">🎨</div>
+                  <h4>Rangoli Studio</h4>
+                  <p>
+                    Tap the button below to start drawing. This prevents accidental marks while scrolling on touchscreens!
+                  </p>
+                  <button
+                    type="button"
+                    className="rangoli-start-btn"
+                    onClick={() => {
+                      setIsDrawingActive(true);
+                      showToastNotification("Drawing mode unlocked! Touch and drag to draw.");
+                    }}
+                  >
+                    ✨ Start Drawing Rangoli
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+
           <div>
-            <div className="field">Choose a rangoli pattern</div>
+            <div className="field">Choose a festive rangoli pattern</div>
             <div className="pattern-picker" id="patternPicker" role="group" aria-label="Choose a rangoli pattern">
               {patterns.map(([patId, label]) => (
                 <button
@@ -1390,6 +2582,7 @@ export default function DiwaliPage() {
                   onClick={() => {
                     setCurrentPattern(patId);
                     drawRangoliPattern(patId);
+                    showToastNotification(`Pattern switched to ${label}`);
                   }}
                 >
                   {label}
@@ -1397,7 +2590,17 @@ export default function DiwaliPage() {
               ))}
             </div>
 
-            <div className="field">Choose a colour</div>
+            <div className="field">
+              Choose gulal colour
+              <span
+                className="brush-indicator"
+                style={{
+                  width: Math.max(10, brushSize),
+                  height: Math.max(10, brushSize),
+                  background: isEraser ? "rgba(255,255,255,0.25)" : activeColour,
+                }}
+              />
+            </div>
             <div className="palette" id="palette">
               {colours.map((col, idx) => (
                 <button
@@ -1415,50 +2618,237 @@ export default function DiwaliPage() {
             </div>
 
             <label className="field" htmlFor="brush">
-              Brush size
+              Brush size ({brushSize}px)
             </label>
             <input
               id="brush"
               type="range"
               min={3}
-              max={28}
+              max={32}
               value={brushSize}
               onChange={(e) => setBrushSize(+e.target.value)}
               style={{ width: "100%", accentColor: "#ffd66b" }}
             />
 
-            <div className="tool-row">
+            <div className="tool-row-3">
               <button
                 type="button"
                 className={`tool-btn eraser-btn ${isEraser ? "active" : ""}`}
                 id="eraserBtn"
-                onClick={() => setIsEraser(!isEraser)}
+                onClick={() => {
+                  if (!isDrawingActive) setIsDrawingActive(true);
+                  setIsEraser(!isEraser);
+                }}
                 aria-pressed={isEraser}
               >
-                {isEraser ? "Eraser on" : "Eraser"}
+                {isEraser ? "Eraser On" : "Eraser"}
               </button>
-              <button type="button" className="tool-btn" onClick={handleClearRangoli}>
-                Reset pattern
+              <button
+                type="button"
+                className="tool-btn"
+                onClick={handleUndo}
+                title="Undo last stroke"
+              >
+                ↩ Undo
+              </button>
+              <button
+                type="button"
+                className="tool-btn"
+                onClick={handleClearDrawing}
+                title="Clear user paint while keeping pattern"
+              >
+                Clear Paint
               </button>
             </div>
+
+            <button
+              type="button"
+              className="tool-btn"
+              style={{
+                background: isDrawingActive ? "rgba(255, 233, 154, 0.16)" : "rgba(255, 255, 255, 0.08)",
+                border: isDrawingActive ? "1px solid #ffd46c" : "1px solid rgba(247, 209, 123, 0.35)",
+                color: isDrawingActive ? "#ffd46c" : "#ffedc0",
+              }}
+              onClick={() => {
+                const nextState = !isDrawingActive;
+                setIsDrawingActive(nextState);
+                showToastNotification(
+                  nextState ? "Drawing mode active!" : "Drawing paused — page scroll enabled"
+                );
+              }}
+            >
+              {isDrawingActive ? "✓ Done Drawing (Scroll Mode)" : "🎨 Enter Drawing Mode"}
+            </button>
 
             <button type="button" className="tool-btn primary" onClick={handleSaveRangoli}>
               Download my rangoli ↓
             </button>
-            <p style={{ fontSize: "11px", color: "#e7c6d1", lineHeight: 1.6 }}>
-              Choose a pattern, then draw with your finger. Use the eraser to remove small mistakes.
+            <p style={{ fontSize: "11px", color: "#e7c6d1", lineHeight: 1.6, marginTop: "8px" }}>
+              ✨ The golden pattern lines will never be erased! Use the eraser to clean up strokes freely. Tap &quot;Done / Enable Scroll&quot; whenever you want to scroll smoothly on mobile.
             </p>
           </div>
         </div>
       </section>
 
+      {/* Surprise Blessing Section */}
+      <section className="content" id="blessing">
+        <div className="panel surprise-panel">
+          <div className="surprise-kicker">✦ A Special Diwali Gift ✦</div>
+          <h2>An Untold Blessing Awaits</h2>
+          <p>
+            Beyond the gleaming lamps and festive sweets lies a personal prayer written especially for your journey ahead. Tap to unfurl your sacred Diwali blessing.
+          </p>
+
+          <div className="surprise-btn-wrap">
+            <div className="surprise-pulse-glow" aria-hidden="true" />
+            <button
+              type="button"
+              className="surprise-btn"
+              onClick={handleOpenSurprise}
+              aria-label="Open surprise emotional Diwali blessing scroll"
+            >
+              <span className="surprise-btn-icon" aria-hidden="true">🪔</span>
+              <span>Open Surprise Blessing ✨</span>
+            </button>
+          </div>
+
+          {/* Confetti Mode Toggle */}
+          <div className="confetti-toggle-container">
+            <button
+              type="button"
+              className={`confetti-toggle-btn ${confettiMode ? "active" : ""}`}
+              onClick={handleToggleConfettiMode}
+              aria-pressed={confettiMode}
+              aria-label="Toggle Golden Confetti Shower during fireworks"
+            >
+              <span className="confetti-toggle-icon" aria-hidden="true">
+                {confettiMode ? "🎊" : "✨"}
+              </span>
+              <span className="confetti-toggle-text">
+                Confetti Mode: <strong>{confettiMode ? "ON" : "OFF"}</strong>
+              </span>
+              <span className={`confetti-pill-switch ${confettiMode ? "active" : ""}`} aria-hidden="true">
+                <span className="confetti-switch-knob" />
+              </span>
+            </button>
+            <p className="confetti-toggle-hint">
+              {confettiMode
+                ? "🌟 Enabled! When you launch fireworks, a persistent shower of golden confetti cascades across the screen."
+                : "💡 Turn ON to cascade continuous golden foil confetti across the screen during the fireworks celebration."}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Vintage Yellowish Parchment Scroll Modal */}
+      <div
+        className={`scroll-backdrop ${surpriseOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Special Diwali Blessing Parchment Scroll"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) handleCloseSurprise();
+        }}
+      >
+        {surpriseOpen && (
+          <div className="scroll-modal">
+            {/* Top Wooden Spindle with Turned Gold Finials */}
+            <div className="scroll-spindle top" aria-hidden="true" />
+
+            {/* Antique Yellowish Parchment Paper Sheet */}
+            <div className="parchment-sheet">
+              {/* Close Button Top Corner */}
+              <button
+                type="button"
+                className="parchment-close-top"
+                onClick={handleCloseSurprise}
+                aria-label="Close blessing scroll"
+              >
+                ✕
+              </button>
+
+              {/* Ornate Corner Filigree */}
+              <span className="parchment-corner tl" aria-hidden="true">❦</span>
+              <span className="parchment-corner tr" aria-hidden="true">❧</span>
+              <span className="parchment-corner bl" aria-hidden="true">❧</span>
+              <span className="parchment-corner br" aria-hidden="true">❦</span>
+
+              {/* Wax Seal with Gold Diya Insignia */}
+              <div className="wax-seal-wrapper">
+                <div className="wax-seal" title="Sacred Diwali Wax Seal" aria-hidden="true">
+                  <div className="wax-seal-inner">🪔</div>
+                </div>
+              </div>
+
+              <div className="parchment-kicker">Shubh Deepavali · Sacred Whispers</div>
+              <h3 className="parchment-heading">A Blessing of Light &amp; Serenity</h3>
+
+              <div className="parchment-divider" aria-hidden="true">
+                <span>✦</span>
+                <span>✧</span>
+                <span>✦</span>
+              </div>
+
+              {/* Revealing Emotional Cursive Calligraphy */}
+              <div className="blessing-cursive">
+                <p>
+                  <span className="drop-first">M</span>ay the sacred flame of the diya illuminate every shadowed corner of your path.
+                </p>
+                <p>
+                  In the gentle warmth of this festive night, may peace settle deep within your heart, may quiet hopes find their wings, and may eternal light guide your footsteps toward boundless grace, inner prosperity, and everlasting serenity.
+                </p>
+                <div className="closing">
+                  Shubh Deepavali to you and everyone you hold dear. 🪔
+                </div>
+              </div>
+
+              {/* Scroll Actions */}
+              <div className="parchment-actions">
+                <button
+                  type="button"
+                  className="parchment-btn primary"
+                  onClick={handleCopyBlessing}
+                >
+                  {isCopiedBlessing ? "✓ Blessing Copied!" : "📋 Copy Blessing"}
+                </button>
+                <button
+                  type="button"
+                  className="parchment-btn secondary"
+                  onClick={handleShareBlessing}
+                >
+                  💬 Share on WhatsApp
+                </button>
+                <button
+                  type="button"
+                  className={`parchment-btn ${confettiMode ? "primary" : "secondary"}`}
+                  onClick={handleToggleConfettiMode}
+                  title="Toggle persistent golden confetti shower during fireworks"
+                >
+                  {confettiMode ? "🎊 Confetti Mode: ON" : "✨ Confetti Mode: OFF"}
+                </button>
+                <button
+                  type="button"
+                  className="parchment-btn secondary"
+                  onClick={handleCloseSurprise}
+                >
+                  📜 Fold Scroll
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom Wooden Spindle with Turned Gold Finials */}
+            <div className="scroll-spindle bottom" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+
       {/* Fireworks Section */}
-      <section className="content">
+      <section className="content" id="celebrate">
         <div className="panel celebrate">
+          <div className="firework-area" id="fireworkArea" ref={fireworkAreaRef} aria-hidden="true" />
           <div className="kicker">Ready for a little magic?</div>
           <h2>Let the sky sparkle!</h2>
           <p>Press the button and send a burst of Diwali joy across the screen.</p>
-          <div className="firework-area" id="fireworkArea" ref={fireworkAreaRef} />
           <button className="btn" onClick={handleLaunchFireworks}>
             Celebrate with fireworks 🎆
           </button>
@@ -1471,27 +2861,156 @@ export default function DiwaliPage() {
           <div className="kicker">Crafted with light by</div>
         </div>
         <div className="nexora" aria-label="Nexora">
-          <span style={{ "--i": 0 } as React.CSSProperties}>N</span>
-          <span style={{ "--i": 1 } as React.CSSProperties}>E</span>
-          <span style={{ "--i": 2 } as React.CSSProperties}>X</span>
-          <span style={{ "--i": 3 } as React.CSSProperties}>O</span>
-          <span style={{ "--i": 4 } as React.CSSProperties}>R</span>
-          <span style={{ "--i": 5 } as React.CSSProperties}>A</span>
+          <span style={{ "--i": "0" } as React.CSSProperties}>N</span>
+          <span style={{ "--i": "1" } as React.CSSProperties}>E</span>
+          <span style={{ "--i": "2" } as React.CSSProperties}>X</span>
+          <span style={{ "--i": "3" } as React.CSSProperties}>O</span>
+          <span style={{ "--i": "4" } as React.CSSProperties}>R</span>
+          <span style={{ "--i": "5" } as React.CSSProperties}>A</span>
         </div>
         <p className="tagline">A duo team · Two minds, one light</p>
         <div className="team-grid">
-          <div className="team-card">
+          <div
+            className="team-card clickable"
+            onClick={() => setSelectedMember("pratik")}
+            role="button"
+            tabIndex={0}
+            aria-label="View Pratik Ghosh profile and connection links"
+          >
             <div className="avatar">PG</div>
-            <h3>Pratik Ghosh</h3>
+            <button
+              type="button"
+              className="team-name-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember("pratik");
+              }}
+            >
+              Pratik Ghosh
+            </button>
             <p>Co-creator</p>
           </div>
-          <div className="team-card">
+          <div
+            className="team-card clickable"
+            onClick={() => setSelectedMember("samragnyi")}
+            role="button"
+            tabIndex={0}
+            aria-label="View Samragnyi Bhowmick profile and connection links"
+          >
             <div className="avatar">SB</div>
-            <h3>Samragnyi Bhowmick</h3>
+            <button
+              type="button"
+              className="team-name-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMember("samragnyi");
+              }}
+            >
+              Samragnyi Bhowmick
+            </button>
             <p>Co-creator</p>
           </div>
         </div>
+        <p style={{ textAlign: "center", fontSize: "12px", color: "#ffd46c", marginTop: "18px", letterSpacing: "1.2px", fontWeight: 700 }}>
+          💡 Click on the names for contacts
+        </p>
       </section>
+
+      {/* Team Member Profile Modal Dialog */}
+      <div
+        className={`team-modal-backdrop ${selectedMember ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Team member profile details"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setSelectedMember(null);
+        }}
+      >
+        {selectedMember && (
+          <div className="team-modal">
+            <button
+              type="button"
+              className="team-modal-close"
+              onClick={() => setSelectedMember(null)}
+              aria-label="Close profile modal"
+            >
+              ✕
+            </button>
+            <div className="team-modal-avatar">
+              {teamMembers[selectedMember].avatar}
+            </div>
+            <h3>{teamMembers[selectedMember].name}</h3>
+            <div className="role">{teamMembers[selectedMember].role}</div>
+            <p className="bio">{teamMembers[selectedMember].bio}</p>
+
+            <div className="team-links-grid">
+              <a
+                href={`mailto:${teamMembers[selectedMember].gmail}`}
+                className="team-link-card"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="team-link-icon">
+                  <GmailIcon size={18} />
+                </div>
+                <div className="team-link-info">
+                  <strong>Gmail</strong>
+                  <small>{teamMembers[selectedMember].gmail}</small>
+                </div>
+                <ExternalIcon size={16} className="team-link-arrow" />
+              </a>
+
+              <a
+                href={teamMembers[selectedMember].instagram}
+                className="team-link-card"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="team-link-icon">
+                  <InstagramIcon size={18} />
+                </div>
+                <div className="team-link-info">
+                  <strong>Instagram</strong>
+                  <small>View Profile</small>
+                </div>
+                <ExternalIcon size={16} className="team-link-arrow" />
+              </a>
+
+              <a
+                href={teamMembers[selectedMember].github}
+                className="team-link-card"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="team-link-icon">
+                  <GithubIcon size={18} />
+                </div>
+                <div className="team-link-info">
+                  <strong>GitHub</strong>
+                  <small>{teamMembers[selectedMember].github.replace("https://github.com/", "")}</small>
+                </div>
+                <ExternalIcon size={16} className="team-link-arrow" />
+              </a>
+
+              <a
+                href={teamMembers[selectedMember].linkedin}
+                className="team-link-card"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="team-link-icon">
+                  <LinkedinIcon size={18} />
+                </div>
+                <div className="team-link-info">
+                  <strong>LinkedIn</strong>
+                  <small>View Professional Profile</small>
+                </div>
+                <ExternalIcon size={16} className="team-link-arrow" />
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Footer */}
       <footer>
@@ -1609,3 +3128,52 @@ export default function DiwaliPage() {
     </>
   );
 }
+
+function GmailIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+function GithubIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function ExternalIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" x2="21" y1="14" y2="3" />
+    </svg>
+  );
+}
+
