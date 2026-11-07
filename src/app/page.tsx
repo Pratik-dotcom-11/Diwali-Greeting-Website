@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const INTRO_DURATION_MS = 8200;
+const BACKGROUND_MUSIC_VOLUME = 0.22;
 
 export default function DiwaliPage() {
   // State for greeting card builder
@@ -133,7 +134,7 @@ export default function DiwaliPage() {
     audio.play().then(() => {
       setMusicOn(true);
       let vol = 0;
-      const targetVol = 0.35;
+      const targetVol = BACKGROUND_MUSIC_VOLUME;
       const fadeIn = setInterval(() => {
         vol = Math.min(targetVol, vol + 0.035);
         audio.volume = vol;
@@ -146,7 +147,7 @@ export default function DiwaliPage() {
           bgMusicRef.current.play().then(() => {
             setMusicOn(true);
             let vol = 0;
-            const targetVol = 0.35;
+            const targetVol = BACKGROUND_MUSIC_VOLUME;
             const fadeIn = setInterval(() => {
               vol = Math.min(targetVol, vol + 0.035);
               if (bgMusicRef.current) bgMusicRef.current.volume = vol;
@@ -252,7 +253,7 @@ export default function DiwaliPage() {
       audio.volume = 0;
       audio.play().then(() => {
         let vol = 0;
-        const targetVol = 0.35;
+        const targetVol = BACKGROUND_MUSIC_VOLUME;
         const fadeInterval = setInterval(() => {
           vol = Math.min(targetVol, vol + 0.04);
           audio.volume = vol;
