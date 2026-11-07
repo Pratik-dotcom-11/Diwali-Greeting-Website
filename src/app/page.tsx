@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 
+const INTRO_DURATION_MS = 7200;
+
 export default function DiwaliPage() {
   // State for greeting card builder
   const [sender, setSender] = useState("");
@@ -92,10 +94,10 @@ export default function DiwaliPage() {
     }
   }, []);
 
-  // Play opening firecrackers sound on website load
+  // Play opening firecrackers sound in sync with the slower intro sequence
   useEffect(() => {
     const t = setTimeout(() => {
-      playCrackersSound(6800);
+      playCrackersSound(INTRO_DURATION_MS);
     }, 250);
     return () => {
       clearTimeout(t);
@@ -1803,7 +1805,7 @@ Shubh Deepavali to you and everyone you hold dear.`;
     // Auto removal of intro veil after timeout
     const introTimer = setTimeout(() => {
       setShowIntro(false);
-    }, 6800);
+    }, INTRO_DURATION_MS);
 
     return () => {
       cancelRibbonTick = true;
