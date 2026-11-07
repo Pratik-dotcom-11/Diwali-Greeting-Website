@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const INTRO_DURATION_MS = 8200;
 const BACKGROUND_MUSIC_VOLUME = 0.22;
-const BACKGROUND_MUSIC_SRC = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Music_diwali-cqGDfWRPdvnEx1CV1cQ22pbnJknAlF.mp4";
+const BACKGROUND_MUSIC_SRC = "/assets/aistudio/Music_diwali_55395a56.mp4";
 
 export default function DiwaliPage() {
   // State for greeting card builder
@@ -131,35 +131,64 @@ export default function DiwaliPage() {
     const audio = bgMusicRef.current;
     if (!audio) return;
 
-    audio.volume = 0;
-    audio.play().then(() => {
-      setMusicOn(true);
-      let vol = 0;
-      const targetVol = BACKGROUND_MUSIC_VOLUME;
-      const fadeIn = setInterval(() => {
-        vol = Math.min(targetVol, vol + 0.035);
-        audio.volume = vol;
-        if (vol >= targetVol) clearInterval(fadeIn);
-      }, 60);
-    }).catch(() => {
-      const startOnInteraction = () => {
-        if (bgMusicRef.current && bgMusicRef.current.paused) {
-          bgMusicRef.current.volume = 0;
-          bgMusicRef.current.play().then(() => {
+    const playMusic = () => {
+      if (!bgMusicRef.current) return;
+      bgMusicRef.current.volume = 0;
+      const playPromise = bgMusicRef.current.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
             setMusicOn(true);
             let vol = 0;
             const targetVol = BACKGROUND_MUSIC_VOLUME;
             const fadeIn = setInterval(() => {
-              vol = Math.min(targetVol, vol + 0.035);
-              if (bgMusicRef.current) bgMusicRef.current.volume = vol;
-              if (vol >= targetVol) clearInterval(fadeIn);
+              if (bgMusicRef.current) {
+                vol = Math.min(targetVol, vol + 0.035);
+                bgMusicRef.current.volume = vol;
+                if (vol >= targetVol) clearInterval(fadeIn);
+              } else {
+                clearInterval(fadeIn);
+              }
             }, 60);
-          }).catch(() => {});
-        }
-        document.removeEventListener("pointerdown", startOnInteraction);
-      };
-      document.addEventListener("pointerdown", startOnInteraction, { once: true });
-    });
+          })
+          .catch(() => {
+            // Browser restricted unprompted autoplay - start on any user interaction gesture
+            const events = ["pointerdown", "click", "touchstart", "keydown", "scroll", "mousemove"];
+            const startOnInteraction = () => {
+              if (bgMusicRef.current && bgMusicRef.current.paused) {
+                bgMusicRef.current.volume = 0;
+                bgMusicRef.current
+                  .play()
+                  .then(() => {
+                    setMusicOn(true);
+                    let vol = 0;
+                    const targetVol = BACKGROUND_MUSIC_VOLUME;
+                    const fadeIn = setInterval(() => {
+                      if (bgMusicRef.current) {
+                        vol = Math.min(targetVol, vol + 0.035);
+                        bgMusicRef.current.volume = vol;
+                        if (vol >= targetVol) clearInterval(fadeIn);
+                      } else {
+                        clearInterval(fadeIn);
+                      }
+                    }, 60);
+                  })
+                  .catch(() => {});
+              }
+              events.forEach((evt) =>
+                window.removeEventListener(evt, startOnInteraction, { capture: true })
+              );
+            };
+
+            events.forEach((evt) =>
+              window.addEventListener(evt, startOnInteraction, { capture: true, once: true })
+            );
+          });
+      }
+    };
+
+    playMusic();
   }, []);
 
   // Refs
@@ -1457,6 +1486,10 @@ Shubh Deepavali to you and everyone you hold dear.`;
     };
 
     const loop = () => {
+      if (typeof document !== "undefined" && document.hidden) {
+        requestAnimationFrame(loop);
+        return;
+      }
       c.globalCompositeOperation = "destination-out";
       c.fillStyle = "rgba(0,0,0,.2)";
       c.fillRect(0, 0, W, H);
@@ -1785,8 +1818,20 @@ Shubh Deepavali to you and everyone you hold dear.`;
       });
       ribbonObserver.observe(ribbonsBox);
 
+      let ribbonFrameSkip = false;
       const tickRibbons = () => {
         if (!on || cancelRibbonTick) return;
+        if (typeof document !== "undefined" && document.hidden) {
+          requestAnimationFrame(tickRibbons);
+          return;
+        }
+        if (isLite()) {
+          ribbonFrameSkip = !ribbonFrameSkip;
+          if (ribbonFrameSkip) {
+            requestAnimationFrame(tickRibbons);
+            return;
+          }
+        }
         vel = vel * 0.9 + (window.scrollY - lastY) * 0.1;
         lastY = window.scrollY;
         const boost = Math.min(Math.abs(vel), 45);
@@ -1827,12 +1872,13 @@ Shubh Deepavali to you and everyone you hold dear.`;
         preload="auto"
       />
   <audio
-  ref={bgMusicRef}
-  src={BACKGROUND_MUSIC_SRC}
-  loop
-  preload="auto"
-  playsInline
-  aria-hidden="true"
+    ref={bgMusicRef}
+    src={BACKGROUND_MUSIC_SRC}
+    autoPlay
+    loop
+    preload="auto"
+    playsInline
+    aria-hidden="true"
   />
       <canvas id="fxCanvas" ref={fxCanvasRef} aria-hidden="true" />
       {showIntro && (
@@ -3028,6 +3074,37 @@ Shubh Deepavali to you and everyone you hold dear.`;
         <br />
         <span style={{ opacity: 0.7 }}>A festive website concept · Built with Next.js, React &amp; TypeScript</span>
       </footer>
+
+      {/* Floating Music Button & Pop-Up Badge */}
+      <div className="floating-music-widget">
+        <button
+          type="button"
+          className="floating-music-pop-badge"
+          onClick={toggleMusic}
+          aria-label={musicOn ? "Pause festive music" : "Play festive music"}
+        >
+          {musicOn ? "♫ Music Playing" : "♫ Turn Music On"}
+        </button>
+        <button
+          type="button"
+          className={`floating-music-btn ${musicOn ? "playing" : ""}`}
+          onClick={toggleMusic}
+          aria-label={musicOn ? "Pause festive music" : "Play festive music"}
+          title={musicOn ? "Pause festive music" : "Turn on music"}
+        >
+          {musicOn && <span className="floating-note-sparkle" aria-hidden="true">🎵</span>}
+          {musicOn ? (
+            <div className="sound-wave-bars" aria-hidden="true">
+              <span className="sound-bar" />
+              <span className="sound-bar" />
+              <span className="sound-bar" />
+              <span className="sound-bar" />
+            </div>
+          ) : (
+            <span className="music-icon-note" aria-hidden="true">♫</span>
+          )}
+        </button>
+      </div>
 
       {/* Back to top button */}
       <button
