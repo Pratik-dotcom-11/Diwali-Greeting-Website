@@ -6,7 +6,7 @@
 
   An interactive and immersive Diwali greeting experience where tradition meets technology.
 
-  **[🌐 LIVE DEMO — EXPERIENCE DIWALI](https://diwali-greeting-website-ynyh.vercel.app)**
+  **[🌐 LIVE DEMO — EXPERIENCE DIWALI](https://diwali-greeting-website-5f35.vercel.app)**
 
 </p>
 
@@ -121,7 +121,7 @@ This project is deployed using **Vercel**.
 
 Every visitor can access the live experience through the following link:
 
-🔗 [Diwali Digital Diya — Live Website](https://diwali-greeting-website-ynyh.vercel.app)
+🔗 [Diwali Digital Diya — Live Website](https://diwali-greeting-website-5f35.vercel.app)
 
 ## ❤️ A Festival of Light, Creativity & Togetherness
 
