@@ -678,104 +678,15 @@ Shubh Deepavali to you and everyone you hold dear.`;
     }\n\nShare your greetings on - ${url}`;
   };
 
-  const wrapShareText = (
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    x: number,
-    y: number,
-    maxWidth: number,
-    lineHeight: number
-  ) => {
-    const words = text.split(" ");
-    let line = "";
-    for (const word of words) {
-      const test = line ? line + " " + word : word;
-      if (ctx.measureText(test).width > maxWidth && line) {
-        ctx.fillText(line, x, y);
-        line = word;
-        y += lineHeight;
-      } else {
-        line = test;
-      }
-    }
-    if (line) ctx.fillText(line, x, y);
-  };
 
-  const createGreetingCardBlob = (): Promise<Blob | null> => {
-    return new Promise((resolve) => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1200;
-      canvas.height = 1500;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return resolve(null);
-
-      const trimmedSender = sender.trim();
-      const trimmedReceiver = receiver.trim();
-      const finalMsg = message.trim() || "May your home be filled with light, laughter and love.";
-
-      const palette =
-        cardStyle === "rose"
-          ? ["#7c1647", "#f4a3c1"]
-          : cardStyle === "blue"
-          ? ["#122d72", "#8ab4ff"]
-          : cardStyle === "amber"
-          ? ["#6e2d08", "#ffc04d"]
-          : ["#580d2d", "#ffd96b"];
-
-      const bg = ctx.createLinearGradient(0, 0, 0, 1500);
-      bg.addColorStop(0, palette[0]);
-      bg.addColorStop(0.58, palette[0]);
-      bg.addColorStop(1, "#260716");
-
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, 1200, 1500);
-
-      ctx.strokeStyle = palette[1];
-      ctx.lineWidth = 4;
-      ctx.strokeRect(28, 28, 1144, 1444);
-
-      ctx.strokeStyle = "rgba(255,217,107,.55)";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(46, 46, 1108, 1408);
-
-      ctx.fillStyle = palette[1];
-      ctx.font = "700 26px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("A WISH FOR YOU", 600, 230);
-
-      ctx.font = "700 92px Georgia";
-      ctx.fillText("Happy Diwali!", 600, 360);
-
-      ctx.font = "italic 34px Georgia";
-      wrapShareText(ctx, finalMsg, 600, 445, 900, 48);
-
-      ctx.font = "700 34px Arial";
-      ctx.fillText(trimmedReceiver ? "To " + trimmedReceiver : "With warm wishes", 600, 650);
-
-      ctx.font = "italic 30px Georgia";
-      ctx.fillText(trimmedSender ? "With love, " + trimmedSender : "Happy Diwali", 600, 730);
-
-      ctx.font = "700 22px Arial";
-      ctx.letterSpacing = "6px";
-      ctx.fillText("DIWALI DIGITAL GREETING", 600, 1375);
-
-      canvas.toBlob(resolve, "image/png");
-    });
-  };
 
   const handleShare = async (channel = "whatsapp") => {
     const url = getShareUrl();
     const text = getShareText();
-    const blob = await createGreetingCardBlob();
-    const file = blob && new File([blob], "diwali-greeting.png", { type: "image/png" });
-    const canShareFile =
-      file &&
-      navigator.share &&
-      (!navigator.canShare || navigator.canShare({ files: [file] }));
 
-    if ((channel === "native" || channel === "whatsapp") && canShareFile) {
+    if (channel === "native" && navigator.share) {
       try {
-        await navigator.share({ title: "Happy Diwali!", text, files: [file] });
+        await navigator.share({ title: "Happy Diwali!", text, url });
         setShareOpen(false);
         return;
       } catch (e: unknown) {
@@ -785,13 +696,8 @@ Shubh Deepavali to you and everyone you hold dear.`;
 
     if (channel === "instagram") {
       try {
-        if (canShareFile) {
-          await navigator.share({ title: "Happy Diwali!", text, files: [file] });
-          setShareOpen(false);
-          return;
-        }
         await navigator.clipboard.writeText(text);
-        showToastNotification("Greeting copied. Paste it in Instagram Direct!");
+        showToastNotification("Greeting copied! Paste it in Instagram Direct ✨");
       } catch {
         showToastNotification("Copy the greeting, then share it on Instagram");
       }
@@ -1922,7 +1828,7 @@ Shubh Deepavali to you and everyone you hold dear.`;
         </button>
       </nav>
 
-      {/* Quick Controls: Ambient Light & Music */}
+      {/* Quick Controls: Ambient Light */}
       <div className="quick-toggles" aria-label="Festive controls">
         <button
           className={`ambient-toggle ${ambientDim ? "active" : ""}`}
@@ -1932,15 +1838,6 @@ Shubh Deepavali to you and everyone you hold dear.`;
           title="Toggle night-time ambient lighting"
         >
           {ambientDim ? "🌙 Ambient light: Night" : "✨ Ambient light: Normal"}
-        </button>
-        <button
-          className="music-toggle"
-          id="musicBtn"
-          onClick={toggleMusic}
-          aria-pressed={musicOn}
-          title="Toggle festive melody"
-        >
-          ♫ Music: {musicOn ? "On" : "Off"}
         </button>
       </div>
 
