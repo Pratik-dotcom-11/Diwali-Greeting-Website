@@ -70,8 +70,8 @@ This project was collaboratively created by:
 
 | Contributor | Role |
 |---|---|
-| **Pratik Ghosh** | Co-Creator & Developer |
-| **Samragnyi Bhowmick** | Co-Creator & Developer |
+| **Samragnyi Bhowmick** | Creator & Designer |
+| **Pratik Ghosh** | Creator & Developer |
 
 Built with creativity, collaboration and a passion for technology. 🪔
 
