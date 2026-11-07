@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 
-const INTRO_DURATION_MS = 7200;
+const INTRO_DURATION_MS = 8200;
 
 export default function DiwaliPage() {
   // State for greeting card builder
@@ -382,7 +382,7 @@ export default function DiwaliPage() {
   };
 
   // Play uploaded firecrackers audio with professional fade-out transition
-  const playCrackersSound = (durationMs = 6800) => {
+  const playCrackersSound = (durationMs = INTRO_DURATION_MS) => {
     try {
       const audio = crackersAudioRef.current;
       if (!audio) return;
@@ -399,7 +399,7 @@ export default function DiwaliPage() {
       });
 
       if (durationMs > 0) {
-        const fadeStart = Math.max(0, durationMs - 700);
+        const fadeStart = Math.max(0, durationMs - 1100);
         setTimeout(() => {
           if (!crackersAudioRef.current) return;
           let vol = crackersAudioRef.current.volume;

@@ -48,13 +48,13 @@ footer{border-top:1px solid #ffffff20;text-align:center;padding:35px 20px;color:
 .in.a-drop,.in.a-pop,.in.a-zoom,.in.a-left,.in.a-right,.in.a-flip,.in.a-blurup,.in.a-clip,.in.a-swing,.in.a-glow,.in.a-unroll,.in.a-rise,.in.a-tilt,.in.a-spin,.in.a-bounce,.in.a-slide,.in.a-zspin{animation-duration:1.45s!important}
 /* ===== Diwali animation layer (added) ===== */
 #fxCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:40;pointer-events:none}
-.intro-veil{position:fixed;inset:0;z-index:39;pointer-events:none;background:radial-gradient(ellipse at 50% 60%,rgba(20,2,10,.35),rgba(12,1,6,.82));opacity:0;animation:veil 7.2s cubic-bezier(.22,.61,.36,1) forwards}
-@keyframes veil{0%{opacity:0}14%{opacity:1}78%{opacity:1}100%{opacity:0;visibility:hidden}}
-.intro-greet{position:fixed;left:50%;top:44%;z-index:41;pointer-events:none;text-align:center;transform:translate(-50%,-50%) scale(.8);opacity:0;animation:greetIn 7.2s cubic-bezier(.22,.61,.36,1) forwards;width:90%}
+.intro-veil{position:fixed;inset:0;z-index:39;pointer-events:none;background:radial-gradient(ellipse at 50% 60%,rgba(20,2,10,.35),rgba(12,1,6,.82));opacity:0;animation:veil 8.2s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes veil{0%{opacity:0}16%{opacity:1}80%{opacity:1}88%{opacity:.72}100%{opacity:0;visibility:hidden}}
+.intro-greet{position:fixed;left:50%;top:44%;z-index:41;pointer-events:none;text-align:center;transform:translate(-50%,-50%) scale(.8);opacity:0;animation:greetIn 8.2s cubic-bezier(.22,.61,.36,1) forwards;width:90%}
 .intro-greet .lamp{font-size:54px;filter:drop-shadow(0 0 22px #ffb52e);animation:lampBob 1.6s ease-in-out infinite alternate}
 .intro-greet h2{font:700 clamp(38px,9vw,78px)/1.05 'Playfair Display',serif;margin:8px 0 6px;background:linear-gradient(100deg,#fff2bd,#f4c34d 50%,#fff0a6);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px #ffb52e88)}
 .intro-greet p{margin:0;color:#ffe9d4;letter-spacing:5px;text-transform:uppercase;font-size:12px;font-weight:700}
-@keyframes greetIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}20%{opacity:1;transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-50%) scale(1.03)}100%{opacity:0;transform:translate(-50%,-56%) scale(1.08);visibility:hidden}}
+@keyframes greetIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}22%{opacity:1;transform:translate(-50%,-50%) scale(1)}76%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}86%{opacity:.82;transform:translate(-50%,-53%) scale(1.04)}100%{opacity:0;transform:translate(-50%,-56%) scale(1.08);visibility:hidden}}
 @keyframes lampBob{to{transform:translateY(-8px) scale(1.08)}}
 .floater{position:fixed;bottom:-20px;width:5px;height:5px;border-radius:50%;background:#ffd66b;box-shadow:0 0 10px 3px #ffb52e88;z-index:-1;pointer-events:none;opacity:0;animation:floatUp linear infinite}
 @keyframes floatUp{0%{opacity:0;transform:translate(0,0) scale(.6)}12%{opacity:.8}100%{opacity:0;transform:translate(var(--sway),-108vh) scale(1.1)}}
@@ -130,7 +130,7 @@ footer{border-top:1px solid #ffffff20;text-align:center;padding:35px 20px;color:
 .mq-sep{font-style:normal;color:#ffd46c;font-size:22px;animation:spinSlow 6s linear infinite}
 @keyframes spinSlow{to{transform:rotate(360deg)}}
 .mq-small{font-size:clamp(12px,2.4vw,16px);font-weight:800;letter-spacing:.35em;text-transform:uppercase;color:transparent;-webkit-text-stroke:1px #f7c94bcc}
-.intro-greet .by{margin-top:16px;font-size:13px;letter-spacing:.4em;color:#ffd46c;animation:byIn 1.2s ease 1.3s both}
+.intro-greet .by{margin-top:16px;font-size:13px;letter-spacing:.4em;color:#ffd46c;animation:byIn 1.4s ease 1.5s both}
 @keyframes byIn{from{opacity:0;letter-spacing:.9em}to{opacity:1;letter-spacing:.4em}}
 .team{text-align:center}
 .nexora{display:flex;justify-content:center;font:800 clamp(52px,15vw,128px)/1.05 'Playfair Display',serif;letter-spacing:.06em;margin:6px 0 2px;filter:drop-shadow(0 0 16px #ffb52e66)}
