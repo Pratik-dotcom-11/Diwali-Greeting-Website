@@ -1,0 +1,206 @@
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index 201366b..843b7aa 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -3,6 +3,7 @@
+ import React, { useEffect, useRef, useState, useCallback } from "react";
+ 
+ const INTRO_DURATION_MS = 8200;
++const BACKGROUND_MUSIC_FALLBACK_SRC = "/assets/aistudio/Music_diwali_site_eee8af26.mpeg";
+ const BACKGROUND_MUSIC_VOLUME = 0.22;
+ const BACKGROUND_MUSIC_SRC = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Music_diwali-cqGDfWRPdvnEx1CV1cQ22pbnJknAlF.mp4";
+ 
+@@ -19,7 +20,7 @@ export default function DiwaliPage() {
+   const [litDiyas, setLitDiyas] = useState<boolean[]>(() => Array(10).fill(false));
+ 
+   // State for Music & Ambient Light
+-  const [musicOn, setMusicOn] = useState(true);
++  const [musicOn, setMusicOn] = useState(false);
+   const [ambientDim, setAmbientDim] = useState(false);
+ 
+   // State for Team Member Profile Modal
+@@ -126,40 +127,58 @@ export default function DiwaliPage() {
+     };
+   }, []);
+ 
+-  // Auto-play background music on website entry with smooth fade-in and interaction recovery
++  // Background music: try to start audibly on entry. Browsers block sound until the visitor
++  // interacts, so if that fails we start muted (always allowed) and unmute on the first gesture.
+   useEffect(() => {
+     const audio = bgMusicRef.current;
+     if (!audio) return;
++    let cancelled = false;
++    const gestureEvents = ["pointerdown", "touchstart", "keydown", "click"] as const;
+ 
+-    audio.volume = 0;
+-    audio.play().then(() => {
+-      setMusicOn(true);
+-      let vol = 0;
+-      const targetVol = BACKGROUND_MUSIC_VOLUME;
+-      const fadeIn = setInterval(() => {
+-        vol = Math.min(targetVol, vol + 0.035);
+-        audio.volume = vol;
+-        if (vol >= targetVol) clearInterval(fadeIn);
+-      }, 60);
+-    }).catch(() => {
+-      const startOnInteraction = () => {
+-        if (bgMusicRef.current && bgMusicRef.current.paused) {
+-          bgMusicRef.current.volume = 0;
+-          bgMusicRef.current.play().then(() => {
+-            setMusicOn(true);
+-            let vol = 0;
+-            const targetVol = BACKGROUND_MUSIC_VOLUME;
+-            const fadeIn = setInterval(() => {
+-              vol = Math.min(targetVol, vol + 0.035);
+-              if (bgMusicRef.current) bgMusicRef.current.volume = vol;
+-              if (vol >= targetVol) clearInterval(fadeIn);
+-            }, 60);
+-          }).catch(() => {});
+-        }
+-        document.removeEventListener("pointerdown", startOnInteraction);
+-      };
+-      document.addEventListener("pointerdown", startOnInteraction, { once: true });
++    const removeGestureListeners = () => {
++      gestureEvents.forEach((ev) => document.removeEventListener(ev, onGesture, true));
++    };
++
++    const startAudible = () => {
++      audio.muted = false;
++      audio.volume = 0;
++      return audio.play().then(() => {
++        if (cancelled) return;
++        musicUserOffRef.current = false;
++        setMusicOn(true);
++        fadeBgMusic(BACKGROUND_MUSIC_VOLUME, 60, 0.035);
++      });
++    };
++
++    function onGesture(e: Event) {
++      // Let the music toggle buttons handle their own clicks
++      const t = e.target as HTMLElement | null;
++      if (t && t.closest && t.closest("#musicBtn, [data-music-toggle]")) return;
++      if (musicUserOffRef.current) {
++        removeGestureListeners();
++        return;
++      }
++      startAudible()
++        .then(() => removeGestureListeners())
++        .catch(() => {
++          /* keep listening for the next gesture */
++        });
++    }
++
++    startAudible().catch(() => {
++      if (cancelled) return;
++      // Autoplay with sound blocked: begin muted so playback is already running, then unmute on gesture
++      audio.muted = true;
++      audio.play().catch(() => {});
++      gestureEvents.forEach((ev) => document.addEventListener(ev, onGesture, true));
+     });
++
++    return () => {
++      cancelled = true;
++      removeGestureListeners();
++      if (bgFadeRef.current) clearInterval(bgFadeRef.current);
++      audio.pause();
++    };
+   }, []);
+ 
+   // Refs
+@@ -178,6 +197,8 @@ export default function DiwaliPage() {
+   } | null>(null);
+   const crackersAudioRef = useRef<HTMLAudioElement | null>(null);
+   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
++  const bgFadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
++  const musicUserOffRef = useRef(false);
+   const fadeOutIntervalRef = useRef<NodeJS.Timeout | null>(null);
+   const isDrawingRef = useRef(false);
+   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+@@ -232,40 +253,47 @@ export default function DiwaliPage() {
+     });
+   };
+ 
+-  // Background Music Controller with smooth fade-in/out transition and balanced volume
++  // Single fade helper so overlapping fades can never fight each other
++  const fadeBgMusic = (target: number, stepMs: number, step: number, onDone?: () => void) => {
++    const audio = bgMusicRef.current;
++    if (!audio) return;
++    if (bgFadeRef.current) clearInterval(bgFadeRef.current);
++    bgFadeRef.current = setInterval(() => {
++      const cur = audio.volume;
++      const next = cur < target ? Math.min(target, cur + step) : Math.max(target, cur - step);
++      audio.volume = next;
++      if (next === target) {
++        if (bgFadeRef.current) clearInterval(bgFadeRef.current);
++        bgFadeRef.current = null;
++        if (onDone) onDone();
++      }
++    }, stepMs);
++  };
++
++  // Background Music Controller with smooth fade-in/out
+   const toggleMusic = () => {
+     const audio = bgMusicRef.current;
+     if (!audio) return;
+ 
+     if (musicOn) {
++      musicUserOffRef.current = true;
+       setMusicOn(false);
+-      let vol = audio.volume;
+-      const fadeInterval = setInterval(() => {
+-        vol = Math.max(0, vol - 0.05);
+-        audio.volume = vol;
+-        if (vol <= 0.01) {
+-          clearInterval(fadeInterval);
+-          audio.pause();
+-        }
+-      }, 50);
++      fadeBgMusic(0, 50, 0.05, () => audio.pause());
+       showToastNotification("♫ Music: Off");
+     } else {
+-      setMusicOn(true);
++      musicUserOffRef.current = false;
++      audio.muted = false;
+       audio.volume = 0;
+-      audio.play().then(() => {
+-        let vol = 0;
+-        const targetVol = BACKGROUND_MUSIC_VOLUME;
+-        const fadeInterval = setInterval(() => {
+-          vol = Math.min(targetVol, vol + 0.04);
+-          audio.volume = vol;
+-          if (vol >= targetVol) {
+-            clearInterval(fadeInterval);
+-          }
+-        }, 50);
+-      }).catch(() => {
+-        showToastNotification("Audio playback failed");
+-      });
+-      showToastNotification("♫ Music: On");
++      audio
++        .play()
++        .then(() => {
++          setMusicOn(true);
++          fadeBgMusic(BACKGROUND_MUSIC_VOLUME, 50, 0.04);
++          showToastNotification("♫ Music: On");
++        })
++        .catch(() => {
++          showToastNotification("Audio playback failed");
++        });
+     }
+   };
+ 
+@@ -1829,6 +1857,14 @@ Shubh Deepavali to you and everyone you hold dear.`;
+   <audio
+   ref={bgMusicRef}
+   src={BACKGROUND_MUSIC_SRC}
++  onError={(e) => {
++    const el = e.currentTarget;
++    if (!el.src.endsWith(BACKGROUND_MUSIC_FALLBACK_SRC)) {
++      el.src = BACKGROUND_MUSIC_FALLBACK_SRC;
++      el.load();
++      if (!musicUserOffRef.current) el.play().catch(() => {});
++    }
++  }}
+   loop
+   preload="auto"
+   playsInline
