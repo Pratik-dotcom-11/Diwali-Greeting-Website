@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const INTRO_DURATION_MS = 8200;
 const BACKGROUND_MUSIC_VOLUME = 0.22;
+const BACKGROUND_MUSIC_SRC = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Music_diwali-cqGDfWRPdvnEx1CV1cQ22pbnJknAlF.mp4";
 
 export default function DiwaliPage() {
   // State for greeting card builder
@@ -1825,12 +1826,14 @@ Shubh Deepavali to you and everyone you hold dear.`;
         src="/assets/aistudio/Crackers_1f4b6b0f.mpeg"
         preload="auto"
       />
-      <audio
-        ref={bgMusicRef}
-        src="/assets/aistudio/Music_diwali_site_eee8af26.mpeg"
-        loop
-        preload="auto"
-      />
+  <audio
+  ref={bgMusicRef}
+  src={BACKGROUND_MUSIC_SRC}
+  loop
+  preload="auto"
+  playsInline
+  aria-hidden="true"
+  />
       <canvas id="fxCanvas" ref={fxCanvasRef} aria-hidden="true" />
       {showIntro && (
         <>
