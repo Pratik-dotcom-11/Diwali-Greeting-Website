@@ -1,47 +1,148 @@
-# 🪔 Diwali Digital Diya
+# 🪔 Diwali Digital Diya — Festival of Lights
 
-A festive, animated Diwali greeting website — light diyas, draw rangoli, create a personalised wish card and set off fireworks.
-Built with **Next.js, React & TypeScript** by team **Nexora**.
+<p align="center">
 
-## ✨ Features
-- **Opening firework show** with a "Shubh Deepavali" greeting (tap anywhere for extra rockets)
-- **Personalised greeting** with live preview, card styles, WhatsApp share and copy
-- **10 interactive diyas** with glow, embers and a fireworks finale when all are lit
-- **Rangoli canvas** with patterns, colours, brush size, eraser and PNG download
-- **Fireworks button**, festive background music (synthesized in the browser)
-- **Marquees** — Nexora names band and crossing "Happy Diwali" ribbons in many Indian languages (speed reacts to scrolling)
-- **Scroll animations** — every section enters with its own animation
-- **Team section** — Nexora, Pratik Ghosh and Samragnyi Bhowmick
-- Mobile-first, responsive, respects `prefers-reduced-motion`
+  ### ✨ Celebrate the Festival of Lights in a Digital Way ✨
 
-## ⚡ Performance
-The site detects weak devices (≤4 CPU cores, ≤4 GB memory, data-saver) and measures its own frame rate; if it struggles it switches to **lite mode** (lighter effects, same features).
-Force a mode with a URL flag: `?fx=lite` or `?fx=full`.
+  An interactive and immersive Diwali greeting experience where tradition meets technology.
 
-## 📁 Project structure
+  **[🌐 LIVE DEMO — EXPERIENCE DIWALI](https://diwali-greeting-website-4gc4.vercel.app/)**
+
+</p>
+
+---
+
+## 🌟 About the Project
+
+**Diwali Digital Diya** is a creative, interactive web experience developed to celebrate the spirit of Diwali through technology.
+
+Designed under **NEXORA**, this project brings together traditional festive elements and modern web interactions, allowing visitors to light digital diyas, create personalised greetings, design rangolis, enjoy festive music and celebrate with colourful fireworks.
+
+Rather than being just another greeting website, it creates an engaging digital space where users can interact, personalise and share the joy of Diwali with their loved ones.
+
+## 🚀 Live Website
+
+<p align="center">
+
+  **Experience the celebration here:**
+
+  🔗 https://diwali-greeting-website-4gc4.vercel.app/
+
+</p>
+
+## ✨ Key Features
+
+| Feature | Description |
+|---|---|
+| 🪔 Interactive Diyas | Light up 10 digital diyas and create a beautiful festive atmosphere. |
+| 💌 Personalised Greetings | Generate customised Diwali greeting cards with sender names, recipient names and personal messages. |
+| 🎨 Digital Rangoli Studio | Create digital rangoli artwork using different patterns, colours and brush sizes. |
+| 🎵 Festive Music | Enjoy a gentle generated festive melody while exploring the website. |
+| 🎆 Fireworks Celebration | Trigger colourful digital fireworks for a spectacular celebration. |
+| ✨ Confetti Mode | Enable continuous golden confetti effects during the celebration. |
+| 🙏 Special Blessing | Discover a personalised festive blessing through an interactive surprise. |
+| 📲 Share Your Wishes | Copy greeting messages or share personalised wishes through WhatsApp. |
+| 🌈 Ambient Lighting | Experience different ambient lighting effects throughout the website. |
+
+## 🛠️ Tech Stack
+
+The project is built using modern web technologies:
+
+- **Next.js** — React framework for the web application.
+- **React.js** — Component-based user interface development.
+- **TypeScript** — Type-safe application development.
+- **CSS** — Styling, layouts and visual presentation.
+- **Vercel** — Deployment and hosting.
+
+## 🎯 Project Objectives
+
+- Bring traditional Diwali celebrations into the digital world.
+- Create an interactive and engaging user experience.
+- Combine festive creativity with modern web development.
+- Make personalised greetings easy to create and share.
+- Demonstrate the potential of interactive frontend technologies.
+
+## 👨‍💻 Meet the Creators
+
+**NEXORA — A Duo Team. Two Minds, One Light.**
+
+This project was collaboratively created by:
+
+| Contributor | Role |
+|---|---|
+| **Pratik Ghosh** | Co-Creator & Developer |
+| **Samragnyi Bhowmick** | Co-Creator & Developer |
+
+Built with creativity, collaboration and a passion for technology. 🪔
+
+## 💻 Run Locally
+
+Want to explore or run this project on your local machine?
+
+Follow these steps:
+
+**1. Clone the repository**
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
 ```
-├── public/                 # Static assets, icons, and media
-├── src/
-│   └── app/
-│       ├── globals.css     # Festive styles, animations, lite-mode rules
-│       ├── layout.tsx      # Root layout, HTML meta tags & early device detection
-│       └── page.tsx        # Greeting, diyas, rangoli, music, fireworks & team
-├── .gitignore              # Git ignored files
-├── AGENTS.md               # Agent guidelines and codebase specifications
-├── eslint.config.mjs       # ESLint configuration
-├── next.config.ts          # Next.js configuration
-├── package.json            # Scripts & dependencies
-├── package-lock.json       # Deterministic package lockfile
-├── README.md               # Project documentation
-└── tsconfig.json           # TypeScript configuration
+
+**2. Navigate to the project directory**
+
+```bash
+cd YOUR_PROJECT_FOLDER
 ```
 
-## ▶️ Run locally
+**3. Install dependencies**
+
 ```bash
 npm install
+```
+
+**4. Start the development server**
+
+```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 👥 Credits
-Crafted with light by **Nexora** — Pratik Ghosh & Samragnyi Bhowmick.
+**5. Open your browser**
+
+Visit:
+
+```text
+http://localhost:3000
+```
+
+The application should now be running locally.
+
+## 🌐 Deployment
+
+This project is deployed using **Vercel**.
+
+Every visitor can access the live experience through the following link:
+
+🔗 [Diwali Digital Diya — Live Website](https://diwali-greeting-website-4gc4.vercel.app/)
+
+## ❤️ A Festival of Light, Creativity & Togetherness
+
+Diwali represents hope, happiness, prosperity and the victory of light over darkness.
+
+With **Diwali Digital Diya**, we wanted to bring a little piece of that celebration to the digital world.
+
+May every diya bring happiness, every wish spread positivity and every moment shine brighter.
+
+<p align="center">
+
+  ### 🪔 शुभ दीपावली | শুভ দীপাবলি | Happy Diwali! 🎆
+
+  **Made with ❤️ by NEXORA**
+
+  *Pratik Ghosh & Samragnyi Bhowmick*
+
+</p>
+
+---
+
+<p align="center">
+  ⭐ If you enjoyed this project, consider giving the repository a star!
+</p>
