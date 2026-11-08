@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const INTRO_DURATION_MS = 8200;
 const BACKGROUND_MUSIC_VOLUME = 0.22;
-const BACKGROUND_MUSIC_SRC = "/assets/aistudio/Music_diwali_55395a56.mp4";
+const BACKGROUND_MUSIC_SRC = "/assets/aistudio/Music_diwali_site_eee8af26.mpeg";
 
 export default function DiwaliPage() {
   // State for greeting card builder
@@ -18,8 +18,8 @@ export default function DiwaliPage() {
   // State for Diya lighting
   const [litDiyas, setLitDiyas] = useState<boolean[]>(() => Array(10).fill(false));
 
-  // State for Music & Ambient Light
-  const [musicOn, setMusicOn] = useState(true);
+  // State for Music & Ambient Light. Start off until playback is confirmed by the browser.
+  const [musicOn, setMusicOn] = useState(false);
   const [ambientDim, setAmbientDim] = useState(false);
 
   // State for Team Member Profile Modal
@@ -126,69 +126,46 @@ export default function DiwaliPage() {
     };
   }, []);
 
-  // Auto-play background music on website entry with smooth fade-in and interaction recovery
+  // Start music as soon as the browser permits it. If autoplay is blocked, the first
+  // real gesture retries playback so the music control never needs a double click.
   useEffect(() => {
     const audio = bgMusicRef.current;
     if (!audio) return;
 
-    const playMusic = () => {
-      if (!bgMusicRef.current) return;
-      bgMusicRef.current.volume = 0;
-      const playPromise = bgMusicRef.current.play();
-
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setMusicOn(true);
-            let vol = 0;
-            const targetVol = BACKGROUND_MUSIC_VOLUME;
-            const fadeIn = setInterval(() => {
-              if (bgMusicRef.current) {
-                vol = Math.min(targetVol, vol + 0.035);
-                bgMusicRef.current.volume = vol;
-                if (vol >= targetVol) clearInterval(fadeIn);
-              } else {
-                clearInterval(fadeIn);
-              }
-            }, 60);
-          })
-          .catch(() => {
-            // Browser restricted unprompted autoplay - start on any user interaction gesture
-            const events = ["pointerdown", "click", "touchstart", "keydown", "scroll", "mousemove"];
-            const startOnInteraction = () => {
-              if (bgMusicRef.current && bgMusicRef.current.paused) {
-                bgMusicRef.current.volume = 0;
-                bgMusicRef.current
-                  .play()
-                  .then(() => {
-                    setMusicOn(true);
-                    let vol = 0;
-                    const targetVol = BACKGROUND_MUSIC_VOLUME;
-                    const fadeIn = setInterval(() => {
-                      if (bgMusicRef.current) {
-                        vol = Math.min(targetVol, vol + 0.035);
-                        bgMusicRef.current.volume = vol;
-                        if (vol >= targetVol) clearInterval(fadeIn);
-                      } else {
-                        clearInterval(fadeIn);
-                      }
-                    }, 60);
-                  })
-                  .catch(() => {});
-              }
-              events.forEach((evt) =>
-                window.removeEventListener(evt, startOnInteraction, { capture: true })
-              );
-            };
-
-            events.forEach((evt) =>
-              window.addEventListener(evt, startOnInteraction, { capture: true, once: true })
-            );
-          });
-      }
+    let disposed = false;
+    const events = ["pointerdown", "touchstart", "keydown", "click"] as const;
+    const fadeIn = () => {
+      let volume = audio.volume;
+      const timer = window.setInterval(() => {
+        volume = Math.min(BACKGROUND_MUSIC_VOLUME, volume + 0.035);
+        audio.volume = volume;
+        if (volume >= BACKGROUND_MUSIC_VOLUME) window.clearInterval(timer);
+      }, 60);
     };
+    const startMusic = () => {
+      if (disposed) return;
+      audio.muted = false;
+      audio.volume = 0;
+      audio.load();
+      audio.play().then(() => {
+        if (disposed) return;
+        setMusicOn(true);
+        removeListeners();
+        fadeIn();
+      }).catch(() => {
+        // Browsers may require a user gesture before allowing audible autoplay.
+      });
+    };
+    const onGesture = () => startMusic();
+    const addListeners = () => events.forEach((event) => window.addEventListener(event, onGesture, { capture: true, once: true }));
+    const removeListeners = () => events.forEach((event) => window.removeEventListener(event, onGesture, true));
 
-    playMusic();
+    startMusic();
+    addListeners();
+    return () => {
+      disposed = true;
+      removeListeners();
+    };
   }, []);
 
   // Refs
