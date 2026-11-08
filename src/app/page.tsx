@@ -1260,6 +1260,10 @@ Shubh Deepavali to you and everyone you hold dear.`;
     drawRangoliPattern(currentPattern);
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 800px)").matches;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    const liteMode = reduce || isMobile || (deviceMemory !== undefined && deviceMemory <= 4);
+    (window as unknown as { __lite?: boolean }).__lite = liteMode;
     const rnd = (a: number, b: number) => a + Math.random() * (b - a);
     const isLite = () => !!(window as unknown as { __lite?: boolean }).__lite;
 
@@ -1370,7 +1374,7 @@ Shubh Deepavali to you and everyone you hold dear.`;
 
     const loop = () => {
       if (typeof document !== "undefined" && document.hidden) {
-        requestAnimationFrame(loop);
+        running = false;
         return;
       }
       c.globalCompositeOperation = "destination-out";
@@ -1705,7 +1709,6 @@ Shubh Deepavali to you and everyone you hold dear.`;
       const tickRibbons = () => {
         if (!on || cancelRibbonTick) return;
         if (typeof document !== "undefined" && document.hidden) {
-          requestAnimationFrame(tickRibbons);
           return;
         }
         if (isLite()) {
