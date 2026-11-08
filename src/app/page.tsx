@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const INTRO_DURATION_MS = 8200;
 const BACKGROUND_MUSIC_VOLUME = 0.22;
-const BACKGROUND_MUSIC_SRC = "/assets/aistudio/Music_diwali_site_eee8af26.mpeg";
+const BACKGROUND_MUSIC_SRC = "/assets/aistudio/Music_diwali_55395a56.mp4";
 
 export default function DiwaliPage() {
   // State for greeting card builder
