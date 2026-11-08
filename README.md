@@ -42,7 +42,7 @@ Rather than being just another greeting website, it creates an engaging digital 
 | ✨ Confetti Mode | Enable continuous golden confetti effects during the celebration. |
 | 🙏 Special Blessing | Discover a personalised festive blessing through an interactive surprise. |
 | 📲 Share Your Wishes | Copy greeting messages or share personalised wishes through WhatsApp. |
-| 🌈 Ambient Lighting | Experience different ambient lighting effects throughout the website. |
+| 🌈 Ambient Lighting | Experience different ambient lighting effects throughout the website only on your desktop. |
 
 ## 🛠️ Tech Stack
 
